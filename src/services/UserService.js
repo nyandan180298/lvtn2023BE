@@ -94,7 +94,67 @@ const loginUser = (userLogin) => {
   });
 };
 
+const updateUser = (id, data) => {
+  return new Promise(async (resolve, reject) => {
+    //Update
+    try {
+      //Check User
+      const checkedUser = await User.findOne({ cID: id });
+
+      if (checkedUser === null) {
+        resolve({
+          status: "Error!",
+          message: "User doesn't exist",
+        });
+      }
+
+      const updatedUser = await User.findOneAndUpdate({ cID: id }, data);
+
+      if (updatedUser) {
+        resolve({
+          status: "OK",
+          message: "Updated successfully",
+          data: updatedUser,
+        });
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const deleteUser = (id) => {
+  return new Promise(async (resolve, reject) => {
+    //Delete
+    try {
+      //Check User
+      const checkedUser = await User.findOne({ cID: id });
+
+      if (checkedUser === null) {
+        resolve({
+          status: "Error!",
+          message: "User doesn't exist",
+        });
+      }
+
+      // await User.findOneAndDelete(
+      //   { cID: id },
+      //   { new: true }
+      // );
+
+      resolve({
+        status: "OK",
+        message: "Deleted user successfully",
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 module.exports = {
   createUser,
   loginUser,
+  updateUser,
+  deleteUser,
 };

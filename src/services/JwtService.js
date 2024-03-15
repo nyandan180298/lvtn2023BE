@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-dotenv.config()
+dotenv.config();
 
 const generateAccessToken = async (payload) => {
   const access_token = jwt.sign({ payload }, process.env.ACCESS_TOKEN, {
@@ -18,7 +18,37 @@ const generateRefreshToken = async (payload) => {
   return refresh_token;
 };
 
+const refreshTokenJwtService = (token) => {
+  return new Promise((resolve, reject) => {
+    try {
+      jwt.verify(token, process.env.ACCESS_TOKEN, async (err, user) => {
+        if (err) {
+          resolve({
+            status: "ERROR",
+            message: "Authentication failed",
+            error: err,
+          });
+        }
+        const { payload } = user;
+        const access_token = await generateAccessToken({
+          id: payload?.id,
+          isAdmin: payload?.isAdmin,
+        });
+
+        resolve({
+          status: "OK",
+          message: "Success",
+          access_token
+        });
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
+  refreshTokenJwtService,
 };

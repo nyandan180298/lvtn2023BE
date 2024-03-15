@@ -137,14 +137,53 @@ const deleteUser = (id) => {
         });
       }
 
-      // await User.findOneAndDelete(
-      //   { cID: id },
-      //   { new: true }
-      // );
+      await User.findOneAndDelete({ cID: id }, { new: true });
 
       resolve({
         status: "OK",
         message: "Deleted user successfully",
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const getAllUser = () => {
+  return new Promise(async (resolve, reject) => {
+    //get all users
+    try {
+      const allUser = await User.find();
+
+      resolve({
+        status: "OK",
+        message: "Success",
+        data: allUser,
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const getUser = (id) => {
+  return new Promise(async (resolve, reject) => {
+    //Get
+    try {
+      //Check User
+      const checkedUser = await User.findOne({ cID: id });
+
+      if (checkedUser === null) {
+        resolve({
+          status: "Error!",
+          message: "User doesn't exist",
+        });
+      }
+
+      resolve({
+        status: "OK",
+        message: "Success",
+        data: checkedUser,
       });
     } catch (e) {
       reject(e);
@@ -157,4 +196,6 @@ module.exports = {
   loginUser,
   updateUser,
   deleteUser,
+  getAllUser,
+  getUser,
 };

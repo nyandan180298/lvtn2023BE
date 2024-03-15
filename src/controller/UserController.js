@@ -1,3 +1,4 @@
+const { refreshTokenJwtService } = require("../services/JwtService");
 const UserService = require("../services/UserService");
 const reg = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
@@ -107,9 +108,69 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const getAllUser = async (req, res) => {
+  try {
+    const result = await UserService.getAllUser();
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
+const getUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    if (!userId) {
+      return res.status(200).json({
+        status: "Error",
+        message: "UserID (cID) is required!",
+      });
+    }
+
+    const result = await UserService.getUser(userId);
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
+const refreshToken = async (req, res) => {
+  try {
+    if (!req.headers) {
+      return res.status(404).json({
+        status: "Error",
+        message: "Headers is required!",
+      });
+    }
+
+    const token = req.headers.token.split(" ")[1];
+    if (!token) {
+      return res.status(404).json({
+        status: "Error",
+        message: "Token is required!",
+      });
+    }
+
+    const result = await refreshTokenJwtService(token);
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
   updateUser,
   deleteUser,
+  getAllUser,
+  getUser,
+  refreshToken,
 };

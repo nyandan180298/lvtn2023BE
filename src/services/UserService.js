@@ -22,7 +22,7 @@ const createUser = (newUser) => {
       if (checkedUser !== null) {
         resolve({
           status: "Error!",
-          message: "username or email already taken",
+          message: "Username hoặc email đã tồn tại",
         });
       }
 
@@ -36,7 +36,7 @@ const createUser = (newUser) => {
         lastName,
       });
       if (createdUser) {
-        resolve({ status: "OK", message: "success", data: createdUser });
+        resolve({ status: "OK", message: "Thành công", data: createdUser });
       }
     } catch (e) {
       reject(e);
@@ -56,7 +56,7 @@ const loginUser = (userLogin) => {
       if (checkedUser === null) {
         resolve({
           status: "Ok",
-          message: "User does not exist",
+          message: "User không tồn tại",
         });
       }
       const comparePassword = bcrypt.compareSync(
@@ -66,7 +66,7 @@ const loginUser = (userLogin) => {
       if (!comparePassword) {
         resolve({
           status: "Ok",
-          message: "Password is incorrect!",
+          message: "Sai mật khẩu!",
         });
       }
 
@@ -83,7 +83,7 @@ const loginUser = (userLogin) => {
       if (checkedUser) {
         resolve({
           status: "OK",
-          message: "success",
+          message: "Thành công",
           access_token: accessToken,
           refresh_token: refreshToken,
         });
@@ -104,7 +104,7 @@ const updateUser = (id, data) => {
       if (checkedUser === null) {
         resolve({
           status: "Error!",
-          message: "User doesn't exist",
+          message: "User không tồn tại",
         });
       }
 
@@ -113,7 +113,7 @@ const updateUser = (id, data) => {
       if (updatedUser) {
         resolve({
           status: "OK",
-          message: "Updated successfully",
+          message: "Thành công",
           data: updatedUser,
         });
       }
@@ -133,7 +133,7 @@ const deleteUser = (id) => {
       if (checkedUser === null) {
         resolve({
           status: "Error!",
-          message: "User doesn't exist",
+          message: "User không tồn tại",
         });
       }
 
@@ -141,7 +141,7 @@ const deleteUser = (id) => {
 
       resolve({
         status: "OK",
-        message: "Deleted user successfully",
+        message: "Xóa thành công",
       });
     } catch (e) {
       reject(e);
@@ -157,7 +157,7 @@ const getAllUser = () => {
 
       resolve({
         status: "OK",
-        message: "Success",
+        message: "Thành công",
         data: allUser,
       });
     } catch (e) {
@@ -176,13 +176,13 @@ const getUser = (id) => {
       if (checkedUser === null) {
         resolve({
           status: "Error!",
-          message: "User doesn't exist",
+          message: "User không tồn tại",
         });
       }
 
       resolve({
         status: "OK",
-        message: "Success",
+        message: "Thành công",
         data: checkedUser,
       });
     } catch (e) {

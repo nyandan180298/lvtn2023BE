@@ -4,7 +4,7 @@ const { generateAccessToken, generateRefreshToken } = require("./JwtService");
 
 const createUser = (newUser) => {
   return new Promise(async (resolve, reject) => {
-    const { cID, username, email, password, phoneNo, firstName, lastName } =
+    const { uID, username, email, password, phoneNo, firstName, lastName } =
       newUser;
     //Password BCRYPT
     const hash = bcrypt.hashSync(password, 10);
@@ -27,7 +27,7 @@ const createUser = (newUser) => {
       }
 
       const createdUser = await User.create({
-        cID,
+        uID,
         username,
         email,
         password: hash,
@@ -99,7 +99,7 @@ const updateUser = (id, data) => {
     //Update
     try {
       //Check User
-      const checkedUser = await User.findOne({ cID: id });
+      const checkedUser = await User.findOne({ uID: id });
 
       if (checkedUser === null) {
         resolve({
@@ -108,7 +108,7 @@ const updateUser = (id, data) => {
         });
       }
 
-      const updatedUser = await User.findOneAndUpdate({ cID: id }, data);
+      const updatedUser = await User.findOneAndUpdate({ uID: id }, data);
 
       if (updatedUser) {
         resolve({
@@ -128,7 +128,7 @@ const deleteUser = (id) => {
     //Delete
     try {
       //Check User
-      const checkedUser = await User.findOne({ cID: id });
+      const checkedUser = await User.findOne({ uID: id });
 
       if (checkedUser === null) {
         resolve({
@@ -137,7 +137,7 @@ const deleteUser = (id) => {
         });
       }
 
-      await User.findOneAndDelete({ cID: id }, { new: true });
+      await User.findOneAndDelete({ uID: id }, { new: true });
 
       resolve({
         status: "OK",
@@ -171,7 +171,7 @@ const getUser = (id) => {
     //Get
     try {
       //Check User
-      const checkedUser = await User.findOne({ cID: id });
+      const checkedUser = await User.findOne({ uID: id });
 
       if (checkedUser === null) {
         resolve({

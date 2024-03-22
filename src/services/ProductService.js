@@ -1,3 +1,4 @@
+const Category = require("../model/CategoryModel");
 const Product = require("../model/ProductModel");
 
 const createProduct = (newProduct) => {
@@ -6,10 +7,9 @@ const createProduct = (newProduct) => {
     //Create
     try {
       //Check Product
-      const checkedProduct =
-        (await Product.findOne({
-          pID: pID,
-        }))
+      const checkedProduct = await Product.findOne({
+        pID: pID,
+      });
 
       if (checkedProduct !== null) {
         resolve({
@@ -42,13 +42,47 @@ const updateProduct = (id, data) => {
         });
       }
 
-      const updatedProduct = await Product.findOneAndUpdate({ pID: id }, data);
+      //update category
+      if (data.categoryID) {
+        const checkCategory = await Category.findOne({
+          categoryID: data.categoryID,
+        });
 
-      if (updatedProduct) {
+        //kiem tra category
+        for (let arr of checkCategory.products) {
+          if (arr.toString() == checkedProduct._id.toString()) {
+            return resolve({
+              status: "Error!",
+              message: "Sản phẩm đã tồn tại trong loại (category)",
+            });
+          }
+        }
+        arr = checkCategory.products.concat(checkedProduct);
+        if (!arr) {
+          arr = [checkedProduct];
+        }
+
+        await Category.findOneAndUpdate(
+          { categoryID: data.categoryID },
+          { products: arr }
+        );
+
+        //Update category khong update data khac 
+        const res = await Product.findOneAndUpdate(
+          { pID: id },
+          { category: checkCategory }
+        );
         resolve({
           status: "OK",
           message: "Thành công",
-          data: updatedProduct,
+          data: res,
+        });
+      } else {
+        const res = await Product.findOneAndUpdate({ pID: id }, data);
+        resolve({
+          status: "OK",
+          message: "Thành công",
+          data: res,
         });
       }
     } catch (e) {
@@ -62,12 +96,12 @@ const deleteProduct = (id) => {
     //Delete
     try {
       //Check Product
-      const checkedProduct = await Product.findOne({ cID: id });
+      const checkedProduct = await Product.findOne({ pID: id });
 
       if (checkedProduct === null) {
         resolve({
           status: "Error!",
-          message: "Product doesn't exist",
+          message: "Sản phẩm không tồn tại",
         });
       }
 
@@ -75,7 +109,7 @@ const deleteProduct = (id) => {
 
       resolve({
         status: "OK",
-        message: "Deleted product successfully",
+        message: "Xóa thành công",
       });
     } catch (e) {
       reject(e);
@@ -91,7 +125,7 @@ const getAllProduct = () => {
 
       resolve({
         status: "OK",
-        message: "Success",
+        message: "Thành công",
         data: allProduct,
       });
     } catch (e) {
@@ -105,18 +139,18 @@ const getProduct = (id) => {
     //Get
     try {
       //Check Product
-      const checkedProduct = await Product.findOne({ cID: id });
+      const checkedProduct = await Product.findOne({ pID: id });
 
       if (checkedProduct === null) {
         resolve({
           status: "Error!",
-          message: "Product doesn't exist",
+          message: "Sản phẩm không tồn tại",
         });
       }
 
       resolve({
         status: "OK",
-        message: "Success",
+        message: "Thành công",
         data: checkedProduct,
       });
     } catch (e) {

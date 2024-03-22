@@ -27,7 +27,7 @@ const updateProduct = async (req, res) => {
     if (!productId) {
       return res.status(200).json({
         status: "Error",
-        message: "ProductID (cID) is required!",
+        message: "ProductID (pID) is required!",
       });
     }
 
@@ -47,7 +47,7 @@ const deleteProduct = async (req, res) => {
     if (!productId) {
       return res.status(200).json({
         status: "Error",
-        message: "ProductID (cID) is required!",
+        message: "ProductID (pID) is required!",
       });
     }
 
@@ -60,7 +60,7 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-const getAllProduct = async (req, res) => {
+const getAllProduct = async (res) => {
   try {
     const result = await ProductService.getAllProduct();
     return res.status(200).json(result);
@@ -78,7 +78,7 @@ const getProduct = async (req, res) => {
     if (!productId) {
       return res.status(200).json({
         status: "Error",
-        message: "ProductID (cID) is required!",
+        message: "ProductID (pID) is required!",
       });
     }
 

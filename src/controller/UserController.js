@@ -5,7 +5,7 @@ const reg = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const createUser = async (req, res) => {
   try {
     const {
-      cID,
+      uID,
       username,
       email,
       password,
@@ -17,7 +17,7 @@ const createUser = async (req, res) => {
     const validEmail = reg.test(email);
 
     if (
-      !cID ||
+      !uID ||
       !username ||
       !email ||
       !password ||
@@ -75,7 +75,7 @@ const updateUser = async (req, res) => {
     if (!userId) {
       return res.status(200).json({
         status: "Error",
-        message: "UserID (cID) is required!",
+        message: "UserID (uID) is required!",
       });
     }
 
@@ -95,7 +95,7 @@ const deleteUser = async (req, res) => {
     if (!userId) {
       return res.status(200).json({
         status: "Error",
-        message: "UserID (cID) is required!",
+        message: "UserID (uID) is required!",
       });
     }
 
@@ -108,7 +108,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const getAllUser = async (req, res) => {
+const getAllUser = async (res) => {
   try {
     const result = await UserService.getAllUser();
     return res.status(200).json(result);
@@ -126,7 +126,7 @@ const getUser = async (req, res) => {
     if (!userId) {
       return res.status(200).json({
         status: "Error",
-        message: "UserID (cID) is required!",
+        message: "UserID (uID) is required!",
       });
     }
 

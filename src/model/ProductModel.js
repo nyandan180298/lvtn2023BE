@@ -5,11 +5,11 @@ const productSchema = new mongoose.Schema(
     name: { type: String, required: true },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
-    nguonNhap: { type: mongoose.Schema.Types.ObjectId, ref: "NguonNhap", require: true },
+    nguonNhap: { type: mongoose.Schema.Types.ObjectId, ref: "NguonNhap" },
     ngayNhap: { type: Date, required: true },
     hanSD: { type: Date, require: true },
     image: { type: Buffer, require: true },
-    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", require: true },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
 
     productDecription: { type: String },
     productReview: { type: String },

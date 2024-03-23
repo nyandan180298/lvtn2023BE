@@ -67,7 +67,7 @@ const updateProduct = (id, data) => {
           { products: arr }
         );
 
-        //Update category khong update data khac 
+        //Update category khong update data khac
         const res = await Product.findOneAndUpdate(
           { pID: id },
           { category: checkCategory }
@@ -117,16 +117,44 @@ const deleteProduct = (id) => {
   });
 };
 
-const getAllProduct = () => {
+const getAllProduct = (limit = 8, page = 0, sort = "asc", filter) => {
   return new Promise(async (resolve, reject) => {
     //get all products
     try {
-      const allProduct = await Product.find();
+      const totalProduct = await Product.countDocuments();
+      //FILTER
+      if (filter) {
+        const filterProduct = await Product.find({ category: filter })
+          .limit(limit)
+          .skip(page * limit);
+        const totalFilter = await Product.find({
+          category: filter,
+        }).countDocuments();
+
+        resolve({
+          status: "OK",
+          message: "Thành công",
+          data: filterProduct,
+          total: totalFilter,
+          page: Number(page) + 1,
+          totalPage: Math.ceil(totalFilter / limit),
+        });
+      }
+
+      const allProduct = await Product.find()
+        .limit(limit)
+        .skip(page * limit)
+        .sort({
+          pID: sort,
+        });
 
       resolve({
         status: "OK",
         message: "Thành công",
         data: allProduct,
+        total: totalProduct,
+        page: Number(page) + 1,
+        totalPage: Math.ceil(totalProduct / limit),
       });
     } catch (e) {
       reject(e);

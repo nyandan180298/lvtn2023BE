@@ -60,7 +60,7 @@ const deleteCategory = async (req, res) => {
   }
 };
 
-const getAllCategory = async (res) => {
+const getAllCategory = async (req, res) => {
   try {
     const result = await CategoryService.getAllCategory();
     return res.status(200).json(result);

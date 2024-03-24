@@ -41,12 +41,43 @@ const updateProduct = (id, data) => {
           message: "Sản phẩm không tồn tại",
         });
       }
-
       //update category
       if (data.categoryID) {
         const checkCategory = await Category.findOne({
           categoryID: data.categoryID,
         });
+
+        //Neu CategoryId moi khac CategoryId Cu
+        if (checkCategory._id.toString() !== checkedProduct.category._id.toString()) {
+          const oldId = checkedProduct.category._id;
+          const oldCt = await Category.findById(oldId)
+          const newId = checkCategory._id
+
+          for (let arr of oldCt.products) {
+            if (arr.toString() == checkedProduct._id.toString()) {
+              oldCt.products.pop(arr)
+
+              //Xoa product o category cu~
+              await Category.findByIdAndUpdate(oldId, {products: oldCt.products})
+
+              //Them product o category moi
+              const newCt = await Category.findById(newId)
+              newCt.products.push(arr)
+              await Category.findByIdAndUpdate(newId, {products: newCt.products})
+
+              //Cap nhat category o Product
+              const res = await Product.findOneAndUpdate(
+                { pID: id },
+                { category: checkCategory }
+              );
+              resolve({
+                status: "OK",
+                message: "Cập nhật Danh mục mới thành công",
+                data: res,
+              });
+            }
+          }
+        }
 
         //kiem tra category
         for (let arr of checkCategory.products) {
@@ -62,22 +93,24 @@ const updateProduct = (id, data) => {
           arr = [checkedProduct];
         }
 
+        //Update Products trong Category
         await Category.findOneAndUpdate(
           { categoryID: data.categoryID },
           { products: arr }
         );
 
-        //Update category khong update data khac
+        // Update category o Product
         const res = await Product.findOneAndUpdate(
           { pID: id },
           { category: checkCategory }
         );
         resolve({
           status: "OK",
-          message: "Thành công",
+          message: "Cập nhật Danh mục thành công",
           data: res,
         });
-      } else {
+      } 
+      else {
         const res = await Product.findOneAndUpdate({ pID: id }, data);
         resolve({
           status: "OK",
@@ -85,6 +118,7 @@ const updateProduct = (id, data) => {
           data: res,
         });
       }
+      
     } catch (e) {
       reject(e);
     }

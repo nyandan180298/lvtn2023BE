@@ -40,6 +40,26 @@ const updateProduct = async (req, res) => {
   }
 };
 
+const updateProductNN = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const data = req.body;
+    if (!productId) {
+      return res.status(200).json({
+        status: "Error",
+        message: "ProductID (pID) is required!",
+      });
+    }
+
+    const result = await ProductService.updateProductNN(productId, data);
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
 const deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -96,6 +116,7 @@ const getProduct = async (req, res) => {
 module.exports = {
   createProduct,
   updateProduct,
+  updateProductNN,
   deleteProduct,
   getAllProduct,
   getProduct,

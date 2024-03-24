@@ -60,7 +60,7 @@ const deleteNguonNhap = async (req, res) => {
   }
 };
 
-const getAllNguonNhap = async (res) => {
+const getAllNguonNhap = async (req, res) => {
   try {
     const result = await NguonNhapService.getAllNguonNhap();
     return res.status(200).json(result);

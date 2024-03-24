@@ -1,4 +1,5 @@
 const Category = require("../model/CategoryModel");
+const NguonNhap = require("../model/NguonNhapModel");
 const Product = require("../model/ProductModel");
 
 const createProduct = (newProduct) => {
@@ -125,6 +126,58 @@ const updateProduct = (id, data) => {
   });
 };
 
+const updateProductNN = (id, data) => {
+  return new Promise(async (resolve, reject) => {
+    //Update
+    try {
+      //Check Product
+      const checkedProduct = await Product.findOne({ pID: id });
+
+      if (checkedProduct === null) {
+        resolve({
+          status: "Error!",
+          message: "Sản phẩm không tồn tại",
+        });
+      }
+      //update nguonNhap
+      if (data.phoneNo) {
+        const checknNhap = await NguonNhap.findOne({
+          phoneNo: data.phoneNo,
+        });
+        if (!checknNhap) {
+          resolve({
+            status: "Error",
+            message: "SĐT Nguồn nhập không tồn tại",
+          });
+        }
+
+        // Update NguonNhap o Product
+        const res = await Product.findOneAndUpdate(
+          { pID: id },
+          { nguonNhap: checknNhap }
+        );
+
+        resolve({
+          status: "OK",
+          message: "Cập nhật Nguồn nhập thành công",
+          data: res,
+        });
+      } 
+      else {
+        const res = await Product.findOneAndUpdate({ pID: id }, data);
+        resolve({
+          status: "OK",
+          message: "Thành công",
+          data: res,
+        });
+      }
+      
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 const deleteProduct = (id) => {
   return new Promise(async (resolve, reject) => {
     //Delete
@@ -224,6 +277,7 @@ const getProduct = (id) => {
 module.exports = {
   createProduct,
   updateProduct,
+  updateProductNN,
   deleteProduct,
   getAllProduct,
   getProduct,

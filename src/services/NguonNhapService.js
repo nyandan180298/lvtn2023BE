@@ -2,7 +2,7 @@ const NguonNhap = require("../model/NguonNhapModel");
 
 const createNguonNhap = (newNguonNhap) => {
   return new Promise(async (resolve, reject) => {
-    const { name, phoneNo } = newNguonNhap;
+    const { phoneNo } = newNguonNhap;
     //Create
     try {
       //Check NguonNhap
@@ -13,7 +13,7 @@ const createNguonNhap = (newNguonNhap) => {
       if (checkedNguonNhap !== null) {
         resolve({
           status: "Error!",
-          message: "Danh mục đã tồn tại",
+          message: "SĐT Nguồn nhập đã tồn tại",
         });
       }
 
@@ -73,7 +73,7 @@ const deleteNguonNhap = (id) => {
       if (checkedNguonNhap === null) {
         resolve({
           status: "Error!",
-          message: "Danh mục không tồn tại",
+          message: "Nguồn nhập không tồn tại",
         });
       }
 
@@ -116,7 +116,7 @@ const getNguonNhap = (id) => {
       if (checkedNguonNhap === null) {
         resolve({
           status: "Error!",
-          message: "Danh mục không tồn tại",
+          message: "Nguồn nhập không tồn tại",
         });
       }
 

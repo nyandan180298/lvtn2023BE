@@ -1,10 +1,12 @@
 const Category = require("../model/CategoryModel");
 const NguonNhap = require("../model/NguonNhapModel");
 const Product = require("../model/ProductModel");
+const Kho = require("../model/KhoModel");
 
-const createProduct = (newProduct) => {
+const createProduct = (newProduct, khoId) => {
   return new Promise(async (resolve, reject) => {
     const { pID } = newProduct;
+    const id = khoId;
     //Create
     try {
       //Check Product
@@ -20,8 +22,23 @@ const createProduct = (newProduct) => {
       }
 
       const createdProduct = await Product.create(newProduct);
+
+      //Them Product vao Kho
+      const checkedKho = await Kho.findOne({ khoID: id });
+      checkedKho.products.push(createdProduct);
+
+      const resKho = await Kho.findOneAndUpdate(
+        { khoID: id },
+        { products: checkedKho.products }
+      );
+
       if (createdProduct) {
-        resolve({ status: "OK", message: "Thành công", data: createdProduct });
+        resolve({
+          status: "OK",
+          message: "Thành công",
+          data: createdProduct,
+          kho: resKho,
+        });
       }
     } catch (e) {
       reject(e);
@@ -49,22 +66,29 @@ const updateProduct = (id, data) => {
         });
 
         //Neu CategoryId moi khac CategoryId Cu
-        if (checkCategory._id.toString() !== checkedProduct.category._id.toString()) {
+        if (
+          checkCategory._id.toString() !==
+          checkedProduct.category._id.toString()
+        ) {
           const oldId = checkedProduct.category._id;
-          const oldCt = await Category.findById(oldId)
-          const newId = checkCategory._id
+          const oldCt = await Category.findById(oldId);
+          const newId = checkCategory._id;
 
           for (let arr of oldCt.products) {
             if (arr.toString() == checkedProduct._id.toString()) {
-              oldCt.products.pop(arr)
+              oldCt.products.pop(arr);
 
               //Xoa product o category cu~
-              await Category.findByIdAndUpdate(oldId, {products: oldCt.products})
+              await Category.findByIdAndUpdate(oldId, {
+                products: oldCt.products,
+              });
 
               //Them product o category moi
-              const newCt = await Category.findById(newId)
-              newCt.products.push(arr)
-              await Category.findByIdAndUpdate(newId, {products: newCt.products})
+              const newCt = await Category.findById(newId);
+              newCt.products.push(arr);
+              await Category.findByIdAndUpdate(newId, {
+                products: newCt.products,
+              });
 
               //Cap nhat category o Product
               const res = await Product.findOneAndUpdate(
@@ -110,8 +134,7 @@ const updateProduct = (id, data) => {
           message: "Cập nhật Danh mục thành công",
           data: res,
         });
-      } 
-      else {
+      } else {
         const res = await Product.findOneAndUpdate({ pID: id }, data);
         resolve({
           status: "OK",
@@ -119,7 +142,6 @@ const updateProduct = (id, data) => {
           data: res,
         });
       }
-      
     } catch (e) {
       reject(e);
     }
@@ -162,8 +184,7 @@ const updateProductNN = (id, data) => {
           message: "Cập nhật Nguồn nhập thành công",
           data: res,
         });
-      } 
-      else {
+      } else {
         const res = await Product.findOneAndUpdate({ pID: id }, data);
         resolve({
           status: "OK",
@@ -171,7 +192,6 @@ const updateProductNN = (id, data) => {
           data: res,
         });
       }
-      
     } catch (e) {
       reject(e);
     }

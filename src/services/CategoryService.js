@@ -68,7 +68,7 @@ const deleteCategory = (id) => {
     //Delete
     try {
       //Check Category
-      const checkedCategory = await Category.findOne({ pID: id });
+      const checkedCategory = await Category.findOne({ cID: id });
 
       if (checkedCategory === null) {
         resolve({

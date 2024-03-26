@@ -4,6 +4,8 @@ const createProduct = async (req, res) => {
   try {
     const { pID, name, quantity, price, ngayNhap, hanSD } = req.body;
 
+    const khoID = req.params.id;
+
     if (!pID || !name || !quantity || !price || !ngayNhap || !hanSD) {
       return res.status(200).json({
         status: "Error",
@@ -11,7 +13,7 @@ const createProduct = async (req, res) => {
       });
     }
 
-    const result = await ProductService.createProduct(req.body);
+    const result = await ProductService.createProduct(req.body, khoID);
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({

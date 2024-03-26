@@ -68,7 +68,7 @@ const deleteNguonNhap = (id) => {
     //Delete
     try {
       //Check NguonNhap
-      const checkedNguonNhap = await NguonNhap.findOne({ pID: id });
+      const checkedNguonNhap = await NguonNhap.findById(id);
 
       if (checkedNguonNhap === null) {
         resolve({
@@ -77,7 +77,7 @@ const deleteNguonNhap = (id) => {
         });
       }
 
-      await NguonNhap.findOneAndDelete({ cID: id }, { new: true });
+      await NguonNhap.findByIdAndDelete(id, { new: true });
 
       resolve({
         status: "OK",

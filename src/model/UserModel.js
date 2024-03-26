@@ -11,6 +11,9 @@ const userSchema = new mongoose.Schema(
     phoneNo: { type: String, required: true },
     address: { type: String, required: false },
     idNumber: { type: Number, required: false,  },
+    
+    kho: [{ type: mongoose.Schema.Types.ObjectId, ref: "Kho"}],
+
     accessToken: { type: String, require: true },
     refreshToken: { type: String, require: true },
 

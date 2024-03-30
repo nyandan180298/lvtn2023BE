@@ -111,7 +111,7 @@ const getNguonNhap = (id) => {
     //Get
     try {
       //Check NguonNhap
-      const checkedNguonNhap = await NguonNhap.findOne({ pID: id });
+      const checkedNguonNhap = await NguonNhap.findById(id);
 
       if (checkedNguonNhap === null) {
         resolve({

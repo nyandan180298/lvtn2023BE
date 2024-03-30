@@ -65,41 +65,45 @@ const updateProduct = (id, data) => {
           categoryID: data.categoryID,
         });
 
-        //Neu CategoryId moi khac CategoryId Cu
-        if (
-          checkCategory._id.toString() !==
-          checkedProduct.category._id.toString()
-        ) {
-          const oldId = checkedProduct.category._id;
-          const oldCt = await Category.findById(oldId);
-          const newId = checkCategory._id;
+        if (checkedProduct.category) {
+          //Neu CategoryId moi khac CategoryId Cu
+          if (
+            checkCategory._id.toString() !==
+            checkedProduct.category._id.toString()
+          ) {
+            const oldId = checkedProduct.category._id;
+            const oldCt = await Category.findById(oldId);
+            const newId = checkCategory._id;
 
-          for (let arr of oldCt.products) {
-            if (arr.toString() == checkedProduct._id.toString()) {
-              oldCt.products.pop(arr);
+            for (let arr of oldCt.products) {
+              if (arr.toString() == checkedProduct._id.toString()) {
+                oldCt.products.pop(arr);
 
-              //Xoa product o category cu~
-              await Category.findByIdAndUpdate(oldId, {
-                products: oldCt.products,
-              });
+                //Xoa product o category cu~
+                await Category.findByIdAndUpdate(oldId, {
+                  products: oldCt.products,
+                  numberProduct: oldCt.numberProduct - 1,
+                });
 
-              //Them product o category moi
-              const newCt = await Category.findById(newId);
-              newCt.products.push(arr);
-              await Category.findByIdAndUpdate(newId, {
-                products: newCt.products,
-              });
+                //Them product o category moi
+                const newCt = await Category.findById(newId);
+                newCt.products.push(arr);
+                await Category.findByIdAndUpdate(newId, {
+                  products: newCt.products,
+                  numberProduct: newCt.numberProduct + 1,
+                });
 
-              //Cap nhat category o Product
-              const res = await Product.findOneAndUpdate(
-                { pID: id },
-                { category: checkCategory }
-              );
-              resolve({
-                status: "OK",
-                message: "Cập nhật Danh mục mới thành công",
-                data: res,
-              });
+                //Cap nhat category o Product
+                const res = await Product.findOneAndUpdate(
+                  { pID: id },
+                  { category: checkCategory }
+                );
+                resolve({
+                  status: "OK",
+                  message: "Cập nhật Danh mục mới thành công",
+                  data: res,
+                });
+              }
             }
           }
         }
@@ -113,15 +117,15 @@ const updateProduct = (id, data) => {
             });
           }
         }
-        arr = checkCategory.products.concat(checkedProduct);
-        if (!arr) {
-          arr = [checkedProduct];
-        }
+        checkCategory.products.push(checkedProduct);
 
         //Update Products trong Category
         await Category.findOneAndUpdate(
           { categoryID: data.categoryID },
-          { products: arr }
+          {
+            products: checkCategory.products,
+            numberProduct: checkCategory.numberProduct + 1,
+          }
         );
 
         // Update category o Product
@@ -136,6 +140,7 @@ const updateProduct = (id, data) => {
         });
       } else {
         const res = await Product.findOneAndUpdate({ pID: id }, data);
+
         resolve({
           status: "OK",
           message: "Thành công",
@@ -239,8 +244,8 @@ const getAllProduct = (limit = 8, page = 0, sort = "asc", filter) => {
         }).countDocuments();
 
         resolve({
-          status: "OK",
           message: "Thành công",
+          error_code: 0,
           data: filterProduct,
           total: totalFilter,
           page: Number(page) + 1,
@@ -256,8 +261,8 @@ const getAllProduct = (limit = 8, page = 0, sort = "asc", filter) => {
         });
 
       resolve({
-        status: "OK",
         message: "Thành công",
+        error_code: 0,
         data: allProduct,
         total: totalProduct,
         page: Number(page) + 1,

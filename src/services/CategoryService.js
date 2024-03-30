@@ -36,7 +36,7 @@ const updateCategory = (id, data) => {
     //Update
     try {
       //Check Category
-      const checkedCategory = await Category.findOne({ pID: id });
+      const checkedCategory = await Category.findOne({ categoryID: id });
 
       if (checkedCategory === null) {
         resolve({
@@ -46,7 +46,7 @@ const updateCategory = (id, data) => {
       }
 
       const updatedCategory = await Category.findOneAndUpdate(
-        { pID: id },
+        { categoryID: id },
         data
       );
 
@@ -68,7 +68,7 @@ const deleteCategory = (id) => {
     //Delete
     try {
       //Check Category
-      const checkedCategory = await Category.findOne({ cID: id });
+      const checkedCategory = await Category.findOne({ categoryID: id });
 
       if (checkedCategory === null) {
         resolve({
@@ -111,7 +111,7 @@ const getCategory = (id) => {
     //Get
     try {
       //Check Category
-      const checkedCategory = await Category.findOne({ pID: id });
+      const checkedCategory = await Category.findOne({ categoryID: id });
 
       if (checkedCategory === null) {
         resolve({

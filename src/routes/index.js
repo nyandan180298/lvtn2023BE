@@ -5,11 +5,11 @@ const nguonNhapRouter = require("./NguonNhapRouter")
 const khoRouter = require("./KhoRouter")
 
 const routes = (app) => {
-  app.use("/api/user", userRouter);
-  app.use("/api/product", productRouter);
-  app.use("/api/category", categoryRouter);
-  app.use("/api/nguon-nhap", nguonNhapRouter);
-  app.use("/api/kho", khoRouter);
+  app.use("/user", userRouter);
+  app.use("/product", productRouter);
+  app.use("/category", categoryRouter);
+  app.use("/nguon-nhap", nguonNhapRouter);
+  app.use("/kho", khoRouter);
 };
 
 module.exports = routes;

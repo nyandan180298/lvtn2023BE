@@ -2,18 +2,16 @@ const ProductService = require("../services/ProductService");
 
 const createProduct = async (req, res) => {
   try {
-    const { pID, name, quantity, price, ngayNhap, hanSD } = req.body;
+    const { pID, name, quantity, price, ngayNhap, hanSD, kho, category, nguonNhap } = req.body;
 
-    const khoID = req.params.id;
-
-    if (!pID || !name || !quantity || !price || !ngayNhap || !hanSD) {
+    if (!pID || !name || !quantity || !price || !ngayNhap || !hanSD || !kho || !category || !nguonNhap) {
       return res.status(200).json({
         status: "Error",
-        message: "Inputs are required!",
+        message: "Tất cả input đều cần thiết!",
       });
     }
 
-    const result = await ProductService.createProduct(req.body, khoID);
+    const result = await ProductService.createProduct(req.body);
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({
@@ -84,9 +82,24 @@ const deleteProduct = async (req, res) => {
 
 const getAllProduct = async (req, res) => {
   try {
-    const {limit , page, sort} = req.query
-    const {filter} = req.body
-    const result = await ProductService.getAllProduct(limit , page, sort, filter);
+    const { limit, page, sort } = req.query;
+    const { filter, khoid } = req.body;
+    const pageVar = page ? page - 1 : 0;
+
+    if (!khoid) {
+      return res.status(400).json({
+        status: "Error",
+        message: "Phải kèm id của kho",
+      });
+    }
+
+    const result = await ProductService.getAllProduct(
+      limit,
+      pageVar,
+      sort,
+      filter,
+      khoid
+    );
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({

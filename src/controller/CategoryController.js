@@ -73,16 +73,16 @@ const getAllCategory = async (req, res) => {
 
 const getCategory = async (req, res) => {
   try {
-    const categoryId = req.params.id;
+    const id = req.params.id;
 
-    if (!categoryId) {
+    if (!id) {
       return res.status(200).json({
         status: "Error",
-        message: "CategoryID (categoryID) is required!",
+        message: "Id is required!",
       });
     }
 
-    const result = await CategoryService.getCategory(categoryId);
+    const result = await CategoryService.getCategory(id);
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({

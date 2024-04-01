@@ -3,16 +3,31 @@ const NguonNhap = require("../model/NguonNhapModel");
 const Product = require("../model/ProductModel");
 const Kho = require("../model/KhoModel");
 
-const createProduct = (newProduct, khoId) => {
+const createProduct = (newProduct) => {
   return new Promise(async (resolve, reject) => {
-    const { pID } = newProduct;
-    const id = khoId;
+    const { pID, kho, category } = newProduct;
     //Create
     try {
       //Check Product
       const checkedProduct = await Product.findOne({
         pID: pID,
       });
+
+      const checkedKho = await Kho.findById(kho);
+      if (checkedKho === null) {
+        resolve({
+          status: "Error!",
+          message: "Kho không tồn tại",
+        });
+      }
+
+      const checkedCategory = await Category.findById(category);
+      if (checkedCategory === null) {
+        resolve({
+          status: "Error!",
+          message: "Danh mục không tồn tại",
+        });
+      }
 
       if (checkedProduct !== null) {
         resolve({
@@ -24,20 +39,23 @@ const createProduct = (newProduct, khoId) => {
       const createdProduct = await Product.create(newProduct);
 
       //Them Product vao Kho
-      const checkedKho = await Kho.findOne({ khoID: id });
       checkedKho.products.push(createdProduct);
+      const resKho = await Kho.findByIdAndUpdate(kho, {
+        products: checkedKho.products,
+      });
 
-      const resKho = await Kho.findOneAndUpdate(
-        { khoID: id },
-        { products: checkedKho.products }
-      );
+      //Them Product vao category
+      checkedCategory.products.push(createdProduct);
+
+      const resCategory = await Category.findByIdAndUpdate(category, {
+        products: checkedCategory.products,
+      });
 
       if (createdProduct) {
         resolve({
           status: "OK",
           message: "Thành công",
-          data: createdProduct,
-          kho: resKho,
+          data: { data: createdProduct, kho: resKho, category: resCategory },
         });
       }
     } catch (e) {
@@ -229,11 +247,12 @@ const deleteProduct = (id) => {
   });
 };
 
-const getAllProduct = (limit = 8, page = 0, sort = "asc", filter) => {
+const getAllProduct = (limit = 5, page = 0, sort = "asc", filter, khoid) => {
   return new Promise(async (resolve, reject) => {
     //get all products
     try {
       const totalProduct = await Product.countDocuments();
+
       //FILTER
       if (filter) {
         const filterProduct = await Product.find({ category: filter })
@@ -246,27 +265,38 @@ const getAllProduct = (limit = 8, page = 0, sort = "asc", filter) => {
         resolve({
           message: "Thành công",
           error_code: 0,
-          data: filterProduct,
-          total: totalFilter,
-          page: Number(page) + 1,
-          totalPage: Math.ceil(totalFilter / limit),
+          data: {
+            data: filterProduct,
+            total: totalFilter,
+            page: Number(page) + 1,
+            totalPage: Math.ceil(totalFilter / limit),
+          },
         });
       }
 
-      const allProduct = await Product.find()
+      const allProduct = await Product.find({ kho: khoid })
         .limit(limit)
         .skip(page * limit)
         .sort({
           pID: sort,
         });
 
+      if (!allProduct[0]) {
+        resolve({
+          message: "Không có sản phẩm trong Kho",
+          error_code: 400,
+        });
+      }
+
       resolve({
         message: "Thành công",
         error_code: 0,
-        data: allProduct,
-        total: totalProduct,
-        page: Number(page) + 1,
-        totalPage: Math.ceil(totalProduct / limit),
+        data: {
+          data: allProduct,
+          total: totalProduct,
+          page: Number(page) + 1,
+          totalPage: Math.ceil(totalProduct / limit),
+        },
       });
     } catch (e) {
       reject(e);
@@ -290,6 +320,7 @@ const getProduct = (id) => {
 
       resolve({
         status: "OK",
+        error_code: 0,
         message: "Thành công",
         data: checkedProduct,
       });

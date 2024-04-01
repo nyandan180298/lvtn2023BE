@@ -10,6 +10,7 @@ const productSchema = new mongoose.Schema(
     hanSD: { type: Date, require: true },
     image: { type: Buffer, require: true },
     category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+    kho: { type: mongoose.Schema.Types.ObjectId, ref: "Kho", required: true },
 
     productDecription: { type: String },
     productReview: { type: String },

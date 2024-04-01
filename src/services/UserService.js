@@ -36,7 +36,12 @@ const createUser = (newUser) => {
         lastName,
       });
       if (createdUser) {
-        resolve({ status: "OK", message: "Thành công", data: createdUser });
+        resolve({
+          status: "OK",
+          message: "Thành công",
+          data: createdUser,
+          error_code: 0,
+        });
       }
     } catch (e) {
       reject(e);
@@ -56,6 +61,7 @@ const loginUser = (userLogin) => {
       if (checkedUser === null) {
         resolve({
           status: "Ok",
+          error_code: 400,
           message: "User không tồn tại",
         });
       }
@@ -66,6 +72,7 @@ const loginUser = (userLogin) => {
       if (!comparePassword) {
         resolve({
           status: "Ok",
+          error_code: 400,
           message: "Sai mật khẩu!",
         });
       }
@@ -83,9 +90,11 @@ const loginUser = (userLogin) => {
       if (checkedUser) {
         resolve({
           status: "OK",
+          error_code: 0,
           message: "Thành công",
-          access_token: accessToken,
-          refresh_token: refreshToken,
+          data: {
+            token: { access_token: accessToken, refresh_token: refreshToken },
+          },
         });
       }
     } catch (e) {
@@ -114,6 +123,7 @@ const updateUser = (id, data) => {
         resolve({
           status: "OK",
           message: "Thành công",
+          error_code: 0,
           data: updatedUser,
         });
       }
@@ -158,6 +168,7 @@ const getAllUser = () => {
       resolve({
         status: "OK",
         message: "Thành công",
+        error_code: 0,
         data: allUser,
       });
     } catch (e) {
@@ -183,6 +194,33 @@ const getUser = (id) => {
       resolve({
         status: "OK",
         message: "Thành công",
+        error_code: 0,
+        data: checkedUser,
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const getMe = (id) => {
+  return new Promise(async (resolve, reject) => {
+    //Get
+    try {
+      //Check User
+      const checkedUser = await User.findById(id);
+
+      if (checkedUser === null) {
+        resolve({
+          status: "Error!",
+          message: "User không tồn tại",
+        });
+      }
+
+      resolve({
+        status: "OK",
+        error_code: 0,
+        message: "Thành công",
         data: checkedUser,
       });
     } catch (e) {
@@ -198,4 +236,5 @@ module.exports = {
   deleteUser,
   getAllUser,
   getUser,
+  getMe,
 };

@@ -125,7 +125,7 @@ const getKho = (id) => {
     //Get
     try {
       //Check Kho
-      const checkedKho = await Kho.findOne({ khoID: id });
+      const checkedKho = await Kho.findById(id);
 
       if (checkedKho === null) {
         resolve({
@@ -136,6 +136,7 @@ const getKho = (id) => {
 
       resolve({
         status: "OK",
+        error_code:0,
         message: "Thành công",
         data: checkedKho,
       });

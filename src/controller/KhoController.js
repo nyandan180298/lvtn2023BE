@@ -78,7 +78,7 @@ const getKho = async (req, res) => {
     if (!khoId) {
       return res.status(200).json({
         status: "Error",
-        message: "KhoID (khoID) is required!",
+        message: "Id is required!",
       });
     }
 

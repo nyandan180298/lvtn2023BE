@@ -1,6 +1,7 @@
 const { refreshTokenJwtService } = require("../services/JwtService");
 const UserService = require("../services/UserService");
 const reg = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const bcrypt = require("bcrypt");
 
 const createUser = async (req, res) => {
   try {
@@ -78,6 +79,10 @@ const updateUser = async (req, res) => {
         message: "UserID (uID) is required!",
       });
     }
+    if (data.password) {
+      data.password = bcrypt.hashSync(data.password, 10);
+
+    }
 
     const result = await UserService.updateUser(userId, data);
     return res.status(200).json(result);
@@ -139,6 +144,18 @@ const getUser = async (req, res) => {
   }
 };
 
+const getMe = async (req, res) => {
+  try {
+    const result = await UserService.getMe(req.user.id);
+
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
 const refreshToken = async (req, res) => {
   try {
     if (!req.headers) {
@@ -172,5 +189,6 @@ module.exports = {
   deleteUser,
   getAllUser,
   getUser,
+  getMe,
   refreshToken,
 };

@@ -111,7 +111,7 @@ const getCategory = (id) => {
     //Get
     try {
       //Check Category
-      const checkedCategory = await Category.findOne({ categoryID: id });
+      const checkedCategory = await Category.findById(id);
 
       if (checkedCategory === null) {
         resolve({

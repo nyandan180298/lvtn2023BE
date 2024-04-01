@@ -3,13 +3,13 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const authMiddleware = (req, res, next) => {
-  if (!req.headers.token) {
+  if (!req.headers.authorization) {
     return res.status(404).json({
-        message: "Missing Token",
-        status: "ERROR",
-      });
-  };
-  const token = req.headers.token.split(" ")[1];
+      message: "Missing Token",
+      status: "ERROR",
+    });
+  }
+  const token = req.headers.authorization.split(" ")[1];
 
   jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
     if (err) {
@@ -31,35 +31,40 @@ const authMiddleware = (req, res, next) => {
 };
 
 const authUserMiddleware = (req, res, next) => {
-  if (!req.headers.token) {
+  if (!req.headers.authorization) {
     return res.status(404).json({
-        message: "Missing Token",
-        status: "ERROR",
-      });
-  };
-  const token = req.headers.token.split(" ")[1];
+      message: "Missing Token",
+      status: "ERROR",
+    });
+  }
+  const token = req.headers.authorization.split(" ")[1];
   const userId = req.params.id;
 
-  jwt.verify(token, process.env.ACCESS_TOKEN, function (err, user) {
-    if (err) {
-      return res.status(404).json({
-        message: "Authentication failed",
-        status: "ERROR",
-      });
+  const decoded = jwt.verify(
+    token,
+    process.env.ACCESS_TOKEN,
+    function (err, user) {
+      if (err) {
+        return res.status(404).json({
+          message: "Authentication failed",
+          status: "ERROR",
+        });
+      }
+      const { payload } = user;
+      if (payload?.isAdmin || payload?.id === userId) {
+        req.user = payload
+        next();
+      } else {
+        return res.status(404).json({
+          message: "Authentication failed",
+          status: "ERROR",
+        });
+      }
     }
-    const { payload } = user;
-    if (payload?.isAdmin || payload?.id === userId) {
-      next();
-    } else {
-      return res.status(404).json({
-        message: "Authentication failed",
-        status: "ERROR",
-      });
-    }
-  });
+  );
 };
 
 module.exports = {
   authMiddleware,
-  authUserMiddleware
+  authUserMiddleware,
 };

@@ -2,12 +2,12 @@ const KhoService = require("../services/KhoService");
 
 const createKho = async (req, res) => {
   try {
-    const { khoID, name, uID } = req.body;
+    const { kho_id, name, uid } = req.body;
 
-    if (!name || !uID || !khoID) {
+    if (!name || !uid || !kho_id) {
       return res.status(200).json({
         status: "Error",
-        message: "Inputs (khoID, name, uid) are required!",
+        message: "Inputs (kho_id, name, uid) are required!",
       });
     }
 
@@ -27,7 +27,7 @@ const updateKho = async (req, res) => {
     if (!khoId) {
       return res.status(200).json({
         status: "Error",
-        message: "KhoId (khoID) is required!",
+        message: "KhoId is required!",
       });
     }
 
@@ -47,7 +47,7 @@ const deleteKho = async (req, res) => {
     if (!khoId) {
       return res.status(200).json({
         status: "Error",
-        message: "KhoID (khoID) is required!",
+        message: "Id is required!",
       });
     }
 

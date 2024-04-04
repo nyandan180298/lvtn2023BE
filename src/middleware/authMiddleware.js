@@ -19,7 +19,7 @@ const authMiddleware = (req, res, next) => {
       });
     }
     const { payload } = user;
-    if (payload.isAdmin) {
+    if (payload.is_admin) {
       next();
     } else {
       return res.status(404).json({
@@ -28,6 +28,33 @@ const authMiddleware = (req, res, next) => {
       });
     }
   });
+};
+
+const authMeMiddleware = (req, res, next) => {
+  if (!req.headers.authorization) {
+    return res.status(404).json({
+      message: "Missing Token",
+      status: "ERROR",
+    });
+  }
+  const token = req.headers.authorization.split(" ")[1];
+  const userId = req.params.id;
+
+  const decoded = jwt.verify(
+    token,
+    process.env.ACCESS_TOKEN,
+    function (err, user) {
+      if (err) {
+        return res.status(404).json({
+          message: "Authentication failed",
+          status: "ERROR",
+        });
+      }
+      const { payload } = user;
+      req.user = payload;
+      next();
+    }
+  );
 };
 
 const authUserMiddleware = (req, res, next) => {
@@ -51,8 +78,8 @@ const authUserMiddleware = (req, res, next) => {
         });
       }
       const { payload } = user;
-      if (payload?.isAdmin || payload?.id === userId) {
-        req.user = payload
+      if (payload?.is_admin || payload?.id === userId) {
+        req.user = payload;
         next();
       } else {
         return res.status(404).json({
@@ -67,4 +94,5 @@ const authUserMiddleware = (req, res, next) => {
 module.exports = {
   authMiddleware,
   authUserMiddleware,
+  authMeMiddleware,
 };

@@ -5,12 +5,12 @@ const Kho = require("../model/KhoModel");
 
 const createProduct = (newProduct) => {
   return new Promise(async (resolve, reject) => {
-    const { pID, kho, category } = newProduct;
+    const { p_id, kho, category, nguon_nhap } = newProduct;
     //Create
     try {
       //Check Product
       const checkedProduct = await Product.findOne({
-        pID: pID,
+        p_id: p_id,
       });
 
       const checkedKho = await Kho.findById(kho);
@@ -18,6 +18,14 @@ const createProduct = (newProduct) => {
         resolve({
           status: "Error!",
           message: "Kho không tồn tại",
+        });
+      }
+
+      const checkedNguonnhap = await NguonNhap.findById(nguon_nhap);
+      if (checkedNguonnhap === null) {
+        resolve({
+          status: "Error!",
+          message: "Nguồn nhập không tồn tại",
         });
       }
 
@@ -53,9 +61,15 @@ const createProduct = (newProduct) => {
 
       if (createdProduct) {
         resolve({
+          error_code: 0,
           status: "OK",
           message: "Thành công",
-          data: { data: createdProduct, kho: resKho, category: resCategory },
+          data: {
+            data: createdProduct,
+            kho: resKho,
+            category: resCategory,
+            nguon_nhap: checkedNguonnhap,
+          },
         });
       }
     } catch (e) {
@@ -69,7 +83,7 @@ const updateProduct = (id, data) => {
     //Update
     try {
       //Check Product
-      const checkedProduct = await Product.findOne({ pID: id });
+      const checkedProduct = await Product.findById(id);
 
       if (checkedProduct === null) {
         resolve({
@@ -77,144 +91,31 @@ const updateProduct = (id, data) => {
           message: "Sản phẩm không tồn tại",
         });
       }
+
       //update category
-      if (data.categoryID) {
-        const checkCategory = await Category.findOne({
-          categoryID: data.categoryID,
+      if (checkedProduct.category.toString() !== data.category) {
+        const oldCt = await Category.findById(checkedProduct.category);
+        const newCt = await Category.findById(data.category);
+
+        oldCt.products.pop(checkedProduct);
+        await Category.findByIdAndUpdate(checkedProduct.category, {
+          products: oldCt.products,
         });
 
-        if (checkedProduct.category) {
-          //Neu CategoryId moi khac CategoryId Cu
-          if (
-            checkCategory._id.toString() !==
-            checkedProduct.category._id.toString()
-          ) {
-            const oldId = checkedProduct.category._id;
-            const oldCt = await Category.findById(oldId);
-            const newId = checkCategory._id;
-
-            for (let arr of oldCt.products) {
-              if (arr.toString() == checkedProduct._id.toString()) {
-                oldCt.products.pop(arr);
-
-                //Xoa product o category cu~
-                await Category.findByIdAndUpdate(oldId, {
-                  products: oldCt.products,
-                  numberProduct: oldCt.numberProduct - 1,
-                });
-
-                //Them product o category moi
-                const newCt = await Category.findById(newId);
-                newCt.products.push(arr);
-                await Category.findByIdAndUpdate(newId, {
-                  products: newCt.products,
-                  numberProduct: newCt.numberProduct + 1,
-                });
-
-                //Cap nhat category o Product
-                const res = await Product.findOneAndUpdate(
-                  { pID: id },
-                  { category: checkCategory }
-                );
-                resolve({
-                  status: "OK",
-                  message: "Cập nhật Danh mục mới thành công",
-                  data: res,
-                });
-              }
-            }
-          }
-        }
-
-        //kiem tra category
-        for (let arr of checkCategory.products) {
-          if (arr.toString() == checkedProduct._id.toString()) {
-            return resolve({
-              status: "Error!",
-              message: "Sản phẩm đã tồn tại trong loại (category)",
-            });
-          }
-        }
-        checkCategory.products.push(checkedProduct);
-
-        //Update Products trong Category
-        await Category.findOneAndUpdate(
-          { categoryID: data.categoryID },
-          {
-            products: checkCategory.products,
-            numberProduct: checkCategory.numberProduct + 1,
-          }
-        );
-
-        // Update category o Product
-        const res = await Product.findOneAndUpdate(
-          { pID: id },
-          { category: checkCategory }
-        );
-        resolve({
-          status: "OK",
-          message: "Cập nhật Danh mục thành công",
-          data: res,
-        });
-      } else {
-        const res = await Product.findOneAndUpdate({ pID: id }, data);
-
-        resolve({
-          status: "OK",
-          message: "Thành công",
-          data: res,
+        newCt.products.push(checkedProduct);
+        await Category.findByIdAndUpdate(data.category, {
+          products: newCt.products,
         });
       }
-    } catch (e) {
-      reject(e);
-    }
-  });
-};
 
-const updateProductNN = (id, data) => {
-  return new Promise(async (resolve, reject) => {
-    //Update
-    try {
-      //Check Product
-      const checkedProduct = await Product.findOne({ pID: id });
+      const res = await Product.findByIdAndUpdate(id, data);
 
-      if (checkedProduct === null) {
-        resolve({
-          status: "Error!",
-          message: "Sản phẩm không tồn tại",
-        });
-      }
-      //update nguonNhap
-      if (data.phoneNo) {
-        const checknNhap = await NguonNhap.findOne({
-          phoneNo: data.phoneNo,
-        });
-        if (!checknNhap) {
-          resolve({
-            status: "Error",
-            message: "SĐT Nguồn nhập không tồn tại",
-          });
-        }
-
-        // Update NguonNhap o Product
-        const res = await Product.findOneAndUpdate(
-          { pID: id },
-          { nguonNhap: checknNhap }
-        );
-
-        resolve({
-          status: "OK",
-          message: "Cập nhật Nguồn nhập thành công",
-          data: res,
-        });
-      } else {
-        const res = await Product.findOneAndUpdate({ pID: id }, data);
-        resolve({
-          status: "OK",
-          message: "Thành công",
-          data: res,
-        });
-      }
+      resolve({
+        error_code: 0,
+        status: "OK",
+        message: "Thành công",
+        data: res,
+      });
     } catch (e) {
       reject(e);
     }
@@ -226,7 +127,7 @@ const deleteProduct = (id) => {
     //Delete
     try {
       //Check Product
-      const checkedProduct = await Product.findOne({ pID: id });
+      const checkedProduct = await Product.findOne({ p_id: id });
 
       if (checkedProduct === null) {
         resolve({
@@ -235,7 +136,7 @@ const deleteProduct = (id) => {
         });
       }
 
-      await Product.findOneAndDelete({ cID: id }, { new: true });
+      await Product.findOneAndDelete({ p_id: id }, { new: true });
 
       resolve({
         status: "OK",
@@ -247,12 +148,10 @@ const deleteProduct = (id) => {
   });
 };
 
-const getAllProduct = (limit = 5, page = 0, sort = "asc", filter, khoid) => {
+const getAllProduct = (limit = 8, page = 0, sort = "asc", filter, khoid) => {
   return new Promise(async (resolve, reject) => {
     //get all products
     try {
-      const totalProduct = await Product.countDocuments();
-
       //FILTER
       if (filter) {
         const filterProduct = await Product.find({ category: filter })
@@ -280,6 +179,8 @@ const getAllProduct = (limit = 5, page = 0, sort = "asc", filter, khoid) => {
         .sort({
           pID: sort,
         });
+
+      const totalProduct = await Product.find({ kho: khoid }).countDocuments();
 
       if (!allProduct[0]) {
         resolve({
@@ -309,7 +210,7 @@ const getProduct = (id) => {
     //Get
     try {
       //Check Product
-      const checkedProduct = await Product.findOne({ pID: id });
+      const checkedProduct = await Product.findOne({ p_id: id });
 
       if (checkedProduct === null) {
         resolve({
@@ -333,7 +234,6 @@ const getProduct = (id) => {
 module.exports = {
   createProduct,
   updateProduct,
-  updateProductNN,
   deleteProduct,
   getAllProduct,
   getProduct,

@@ -2,12 +2,12 @@ const NguonNhap = require("../model/NguonNhapModel");
 
 const createNguonNhap = (newNguonNhap) => {
   return new Promise(async (resolve, reject) => {
-    const { phoneNo } = newNguonNhap;
+    const { phone_num } = newNguonNhap;
     //Create
     try {
       //Check NguonNhap
       const checkedNguonNhap = await NguonNhap.findOne({
-        phoneNo: phoneNo,
+        phone_num: phone_num,
       });
 
       if (checkedNguonNhap !== null) {

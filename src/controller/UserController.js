@@ -6,38 +6,36 @@ const bcrypt = require("bcrypt");
 const createUser = async (req, res) => {
   try {
     const {
-      uID,
+      uid,
       username,
       email,
       password,
-      confirmPassword,
-      phoneNo,
-      firstName,
-      lastName,
+      confirm_password,
+      first_name,
+      last_name,
     } = req.body;
     const validEmail = reg.test(email);
 
     if (
-      !uID ||
+      !uid ||
       !username ||
       !email ||
       !password ||
-      !confirmPassword ||
-      !phoneNo ||
-      !firstName ||
-      !lastName
+      !confirm_password ||
+      !first_name ||
+      !last_name
     ) {
-      return res.status(200).json({
+      return res.status(400).json({
         status: "Error",
         message: "All inputs are required!",
       });
     } else if (!validEmail) {
-      return res.status(200).json({
+      return res.status(400).json({
         status: "Error",
         message: "Email must be valid",
       });
-    } else if (password !== confirmPassword) {
-      return res.status(200).json({
+    } else if (password !== confirm_password) {
+      return res.status(400).json({
         status: "Error",
         message: "Password must match eachother",
       });

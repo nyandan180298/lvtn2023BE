@@ -2,13 +2,13 @@ const Category = require("../model/CategoryModel");
 
 const createCategory = (newCategory) => {
   return new Promise(async (resolve, reject) => {
-    const { categoryID, name } = newCategory;
+    const { category_id, name } = newCategory;
     //Create
     try {
       //Check Category
       const checkedCategory =
         (await Category.findOne({
-          categoryID: categoryID,
+          category_id: category_id,
         })) ||
         (await Category.findOne({
           name: name,
@@ -36,7 +36,7 @@ const updateCategory = (id, data) => {
     //Update
     try {
       //Check Category
-      const checkedCategory = await Category.findOne({ categoryID: id });
+      const checkedCategory = await Category.findOne({ category_id: id });
 
       if (checkedCategory === null) {
         resolve({
@@ -46,7 +46,7 @@ const updateCategory = (id, data) => {
       }
 
       const updatedCategory = await Category.findOneAndUpdate(
-        { categoryID: id },
+        { category_id: id },
         data
       );
 
@@ -68,7 +68,7 @@ const deleteCategory = (id) => {
     //Delete
     try {
       //Check Category
-      const checkedCategory = await Category.findOne({ categoryID: id });
+      const checkedCategory = await Category.findOne({ category_id: id });
 
       if (checkedCategory === null) {
         resolve({
@@ -77,7 +77,7 @@ const deleteCategory = (id) => {
         });
       }
 
-      await Category.findOneAndDelete({ cID: id }, { new: true });
+      await Category.findOneAndDelete({ category_id: id }, { new: true });
 
       resolve({
         status: "OK",

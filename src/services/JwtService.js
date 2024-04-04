@@ -32,7 +32,7 @@ const refreshTokenJwtService = (token) => {
         const { payload } = user;
         const access_token = await generateAccessToken({
           id: payload?.id,
-          isAdmin: payload?.isAdmin,
+          is_admin: payload?.is_admin,
         });
 
         resolve({

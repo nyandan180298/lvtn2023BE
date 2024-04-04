@@ -2,12 +2,33 @@ const ProductService = require("../services/ProductService");
 
 const createProduct = async (req, res) => {
   try {
-    const { pID, name, quantity, price, ngayNhap, hanSD, kho, category, nguonNhap } = req.body;
+    const {
+      p_id,
+      name,
+      quantity,
+      price,
+      ngay_nhap,
+      han_sd,
+      kho,
+      category,
+      nguon_nhap,
+    } = req.body;
 
-    if (!pID || !name || !quantity || !price || !ngayNhap || !hanSD || !kho || !category || !nguonNhap) {
+    if (
+      !p_id ||
+      !name ||
+      !quantity ||
+      !price ||
+      !ngay_nhap ||
+      !han_sd ||
+      !kho ||
+      !category ||
+      !nguon_nhap
+    ) {
       return res.status(200).json({
         status: "Error",
-        message: "Tất cả input đều cần thiết!",
+        message:
+          "Tất cả input p_id, name, quantity, price, ngay_nhap, han_sd, kho, category, nguon_nhap đều cần thiết!",
       });
     }
 
@@ -22,36 +43,26 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
+    const pid = req.params.id;
     const data = req.body;
-    if (!productId) {
-      return res.status(200).json({
+
+    const { category } = req.body;
+
+    if (!pid) {
+      return res.status(400).json({
         status: "Error",
-        message: "ProductID (pID) is required!",
+        message: "id is required!",
       });
     }
 
-    const result = await ProductService.updateProduct(productId, data);
-    return res.status(200).json(result);
-  } catch (e) {
-    return res.status(404).json({
-      message: e,
-    });
-  }
-};
-
-const updateProductNN = async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const data = req.body;
-    if (!productId) {
-      return res.status(200).json({
+    if (!category) {
+      return res.status(400).json({
         status: "Error",
-        message: "ProductID (pID) is required!",
+        message: "category is required!",
       });
     }
 
-    const result = await ProductService.updateProductNN(productId, data);
+    const result = await ProductService.updateProduct(pid, data);
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({
@@ -62,16 +73,16 @@ const updateProductNN = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
+    const pid = req.params.id;
 
-    if (!productId) {
-      return res.status(200).json({
+    if (!pid) {
+      return res.status(400).json({
         status: "Error",
-        message: "ProductID (pID) is required!",
+        message: "p_id is required!",
       });
     }
 
-    const result = await ProductService.deleteProduct(productId);
+    const result = await ProductService.deleteProduct(pid);
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({
@@ -110,16 +121,16 @@ const getAllProduct = async (req, res) => {
 
 const getProduct = async (req, res) => {
   try {
-    const productId = req.params.id;
+    const pid = req.params.id;
 
-    if (!productId) {
+    if (!pid) {
       return res.status(200).json({
         status: "Error",
-        message: "ProductID (pID) is required!",
+        message: "pid is required!",
       });
     }
 
-    const result = await ProductService.getProduct(productId);
+    const result = await ProductService.getProduct(pid);
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({
@@ -131,7 +142,6 @@ const getProduct = async (req, res) => {
 module.exports = {
   createProduct,
   updateProduct,
-  updateProductNN,
   deleteProduct,
   getAllProduct,
   getProduct,

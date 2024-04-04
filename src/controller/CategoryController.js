@@ -2,9 +2,9 @@ const CategoryService = require("../services/CategoryService");
 
 const createCategory = async (req, res) => {
   try {
-    const { categoryID, name } = req.body;
+    const { category_id, name } = req.body;
 
-    if (!name || !categoryID) {
+    if (!name || !category_id) {
       return res.status(200).json({
         status: "Error",
         message: "Inputs are required!",
@@ -22,16 +22,16 @@ const createCategory = async (req, res) => {
 
 const updateCategory = async (req, res) => {
   try {
-    const categoryId = req.params.id;
+    const category_id = req.params.id;
     const data = req.body;
-    if (!categoryId) {
+    if (!category_id) {
       return res.status(200).json({
         status: "Error",
-        message: "CategoryID (categoryID) is required!",
+        message: "category_id is required!",
       });
     }
 
-    const result = await CategoryService.updateCategory(categoryId, data);
+    const result = await CategoryService.updateCategory(category_id, data);
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({
@@ -42,16 +42,16 @@ const updateCategory = async (req, res) => {
 
 const deleteCategory = async (req, res) => {
   try {
-    const categoryId = req.params.id;
+    const category_id = req.params.id;
 
-    if (!categoryId) {
+    if (!category_id) {
       return res.status(200).json({
         status: "Error",
-        message: "CategoryID (categoryID) is required!",
+        message: "category_id is required!",
       });
     }
 
-    const result = await CategoryService.deleteCategory(categoryId);
+    const result = await CategoryService.deleteCategory(category_id);
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({

@@ -127,7 +127,7 @@ const deleteProduct = (id) => {
     //Delete
     try {
       //Check Product
-      const checkedProduct = await Product.findOne({ p_id: id });
+      const checkedProduct = await Product.findById(id);
 
       if (checkedProduct === null) {
         resolve({
@@ -136,7 +136,7 @@ const deleteProduct = (id) => {
         });
       }
 
-      await Product.findOneAndDelete({ p_id: id }, { new: true });
+      await Product.findByIdAndDelete(id, { new: true });
 
       resolve({
         status: "OK",

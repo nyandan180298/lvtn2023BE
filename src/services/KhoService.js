@@ -1,5 +1,6 @@
 const Kho = require("../model/KhoModel");
 const User = require("../model/UserModel");
+const Product = require("../model/ProductModel");
 
 const createKho = (newKho) => {
   return new Promise(async (resolve, reject) => {
@@ -97,9 +98,20 @@ const deleteKho = (id) => {
         });
       }
 
+      checkedKho.products.forEach(async (value) => {
+        await Product.findByIdAndDelete(value);
+      });
+
+      const manager = await User.findById(checkedKho.user);
+
+      manager.kho.pop(checkedKho);
+
+      await User.findByIdAndUpdate(checkedKho.user, { kho: manager.kho });
+
       await Kho.findByIdAndDelete(id, { new: true });
 
       resolve({
+        error_code: 0,
         status: "OK",
         message: "Xóa thành công",
       });

@@ -22,6 +22,7 @@ const createNguonNhap = (newNguonNhap) => {
         resolve({
           status: "OK",
           message: "Thành công",
+          error_code: 0,
           data: createdNguonNhap,
         });
       }
@@ -36,7 +37,7 @@ const updateNguonNhap = (id, data) => {
     //Update
     try {
       //Check NguonNhap
-      const checkedNguonNhap = await NguonNhap.findById({ _id: id });
+      const checkedNguonNhap = await NguonNhap.findById(id);
 
       if (checkedNguonNhap === null) {
         resolve({
@@ -45,13 +46,11 @@ const updateNguonNhap = (id, data) => {
         });
       }
 
-      const updatedNguonNhap = await NguonNhap.findByIdAndUpdate(
-        { _id: id },
-        data
-      );
+      const updatedNguonNhap = await NguonNhap.findByIdAndUpdate(id, data);
 
       if (updatedNguonNhap) {
         resolve({
+          error_code: 0,
           status: "OK",
           message: "Thành công",
           data: updatedNguonNhap,
@@ -122,6 +121,7 @@ const getNguonNhap = (id) => {
 
       resolve({
         status: "OK",
+        error_code: 0,
         message: "Thành công",
         data: checkedNguonNhap,
       });

@@ -177,7 +177,7 @@ const getAllProduct = (limit = 8, page = 0, sort = "asc", filter, khoid) => {
         .limit(limit)
         .skip(page * limit)
         .sort({
-          pID: sort,
+          p_id: sort,
         });
 
       const totalProduct = await Product.find({ kho: khoid }).countDocuments();

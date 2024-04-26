@@ -2,7 +2,13 @@ const NguonNhapService = require("../services/NguonNhapService");
 
 const createNguonNhap = async (req, res) => {
   try {
-    const { name, phone_num } = req.body;
+    const { name, phone_num, khoid } = req.body;
+
+    if (!khoid)
+      return res.status(200).json({
+        status: "Error",
+        message: "Thiếu id của kho!",
+      });
 
     if (!name || !phone_num) {
       return res.status(200).json({

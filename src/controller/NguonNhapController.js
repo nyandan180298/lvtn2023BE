@@ -2,9 +2,9 @@ const NguonNhapService = require("../services/NguonNhapService");
 
 const createNguonNhap = async (req, res) => {
   try {
-    const { name, phone_num, khoid } = req.body;
+    const { name, phone_num, kho_id } = req.body;
 
-    if (!khoid)
+    if (!kho_id)
       return res.status(200).json({
         status: "Error",
         message: "Thiếu id của kho!",
@@ -13,7 +13,7 @@ const createNguonNhap = async (req, res) => {
     if (!name || !phone_num) {
       return res.status(200).json({
         status: "Error",
-        message: "Inputs are required!",
+        message: "Thiếu tên nguồn nhập hoặc sđt!",
       });
     }
 

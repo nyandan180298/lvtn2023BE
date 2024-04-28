@@ -1,8 +1,9 @@
+const Kho = require("../model/KhoModel");
 const NguonNhap = require("../model/NguonNhapModel");
 
 const createNguonNhap = (newNguonNhap) => {
   return new Promise(async (resolve, reject) => {
-    const { phone_num } = newNguonNhap;
+    const { phone_num, kho_id, name } = newNguonNhap;
     //Create
     try {
       //Check NguonNhap
@@ -17,7 +18,28 @@ const createNguonNhap = (newNguonNhap) => {
         });
       }
 
-      const createdNguonNhap = await NguonNhap.create(newNguonNhap);
+      const checkedKho = await Kho.findById(kho_id);
+
+      if (checkedKho === null) {
+        resolve({
+          status: "Error!",
+          message: "Kho không tồn tại",
+          error_code: 404,
+        });
+      }
+
+      const createdNguonNhap = await NguonNhap.create({
+        phone_num,
+        kho: kho_id,
+        name,
+      });
+
+      checkedKho.nguon_nhaps.push(createdNguonNhap);
+
+      await Kho.findByIdAndUpdate(kho_id, {
+        nguon_nhaps: checkedKho.nguon_nhaps,
+      });
+
       if (createdNguonNhap) {
         resolve({
           status: "OK",
@@ -76,10 +98,18 @@ const deleteNguonNhap = (id) => {
         });
       }
 
+      const checkedKho = await Kho.findById(checkedNguonNhap.kho);
+      checkedKho.nguon_nhaps.pop(checkedNguonNhap);
+
+      await Kho.findByIdAndUpdate(checkedNguonNhap.kho, {
+        nguon_nhaps: checkedKho.nguon_nhaps,
+      });
+
       await NguonNhap.findByIdAndDelete(id, { new: true });
 
       resolve({
         status: "OK",
+        error_code: 0,
         message: "Xóa thành công",
       });
     } catch (e) {

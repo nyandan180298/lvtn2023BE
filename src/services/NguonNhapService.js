@@ -118,16 +118,31 @@ const deleteNguonNhap = (id) => {
   });
 };
 
-const getAllNguonNhap = () => {
+const getAllNguonNhap = (limit = 8, page = 0, khoid) => {
   return new Promise(async (resolve, reject) => {
     //get all categories
     try {
-      const allNguonNhap = await NguonNhap.find();
+      const allNguonNhap = await NguonNhap.find({ kho: khoid })
+        .limit(limit)
+        .skip(page * limit)
+        .sort({
+          name: "asc",
+        });
+
+      const totalNguonNhap = await NguonNhap.find({
+        kho: khoid,
+      }).countDocuments();
 
       resolve({
         status: "OK",
+        error_code: 0,
         message: "Thành công",
-        data: allNguonNhap,
+        data: {
+          data: allNguonNhap,
+          total: totalNguonNhap,
+          page: Number(page) + 1,
+          totalPage: Math.ceil(totalNguonNhap/ limit),
+        },
       });
     } catch (e) {
       reject(e);

@@ -68,7 +68,11 @@ const deleteNguonNhap = async (req, res) => {
 
 const getAllNguonNhap = async (req, res) => {
   try {
-    const result = await NguonNhapService.getAllNguonNhap();
+    const { limit, page } = req.query;
+    const { khoid } = req.body;
+    const pageVar = page ? page - 1 : 0;
+    const result = await NguonNhapService.getAllNguonNhap(limit, pageVar, khoid);
+
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({

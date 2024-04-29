@@ -6,7 +6,7 @@ const nguonNhapController = require('../controller/NguonNhapController')
 router.post("/create", nguonNhapController.createNguonNhap);
 router.post("/update/:id", nguonNhapController.updateNguonNhap);
 router.delete("/delete/:id", authMiddleware, nguonNhapController.deleteNguonNhap);
-router.get("/getAll", nguonNhapController.getAllNguonNhap);
+router.post("/getAll", nguonNhapController.getAllNguonNhap);
 router.get("/get/:id", nguonNhapController.getNguonNhap);
 
 module.exports = router;

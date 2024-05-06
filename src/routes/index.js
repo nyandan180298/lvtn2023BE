@@ -4,6 +4,7 @@ const categoryRouter = require("./CategoryRouter");
 const nguonNhapRouter = require("./NguonNhapRouter")
 const khoRouter = require("./KhoRouter")
 const customerRouter = require("./CustomerRouter")
+const orderRouter = require("./OrderRouter")
 
 const routes = (app) => {
   app.use("/user", userRouter);
@@ -12,6 +13,7 @@ const routes = (app) => {
   app.use("/nguon-nhap", nguonNhapRouter);
   app.use("/kho", khoRouter);
   app.use("/customer", customerRouter);
+  app.use("/order", orderRouter);
 };
 
 module.exports = routes;

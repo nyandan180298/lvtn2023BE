@@ -4,27 +4,16 @@ const createOrder = async (req, res) => {
   try {
     const {
       address,
-      status,
       kho,
       customer, // ten customer
       customer_phone_num, // sdt customer
       detail,
-      total,
     } = req.body;
 
-    if (
-      !address||
-      !status||
-      !kho||
-      !customer||
-      !customer_phone_num||
-      !detail||
-      !total
-    ) {
+    if (!address || !kho || !customer || !customer_phone_num || !detail) {
       return res.status(200).json({
         status: "Error",
-        message:
-          "Tất cả input address, status, kho, customer, detail, total",
+        message: "Tất cả input address, status, kho, customer, detail, total",
       });
     }
 
@@ -39,26 +28,66 @@ const createOrder = async (req, res) => {
 
 const updateOrder = async (req, res) => {
   try {
-    const pid = req.params.id;
+    const id = req.params.id;
     const data = req.body;
 
-    const { category } = req.body;
-
-    if (!pid) {
+    if (!id) {
       return res.status(400).json({
         status: "Error",
         message: "id is required!",
       });
     }
 
-    if (!category) {
+    const result = await OrderService.updateOrder(id, data);
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
+const completeOrder = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = req.body;
+    const { phone_num } = req.body;
+
+    if (!id) {
       return res.status(400).json({
         status: "Error",
-        message: "category is required!",
+        message: "Thiếu id đơn hàng!",
+      });
+    }
+    if (!phone_num) {
+      return res.status(400).json({
+        status: "Error",
+        message: "Thiếu số điện thoại khách hàng",
       });
     }
 
-    const result = await OrderService.updateOrder(pid, data);
+    const result = await OrderService.completeOrder(id, data);
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
+const cancelOrder = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = req.body;
+
+    if (!id) {
+      return res.status(400).json({
+        status: "Error",
+        message: "Thiếu id đơn hàng!",
+      });
+    }
+
+    const result = await OrderService.cancelOrder(id, data);
     return res.status(200).json(result);
   } catch (e) {
     return res.status(404).json({
@@ -141,4 +170,6 @@ module.exports = {
   deleteOrder,
   getAllOrder,
   getOrder,
+  completeOrder,
+  cancelOrder,
 };

@@ -5,6 +5,7 @@ const khoSchema = new mongoose.Schema({
   products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   customers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Customer" }],
   nguon_nhaps: [{ type: mongoose.Schema.Types.ObjectId, ref: "NguonNhap" }],
+  orders: [{type: mongoose.Schema.Types.ObjectId, ref: "Order"}],
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 const Kho = mongoose.model("Kho", khoSchema);

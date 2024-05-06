@@ -1,11 +1,20 @@
-const Category = require("../model/CategoryModel");
 const Kho = require("../model/KhoModel");
 const { Order } = require("../model/OrderModel");
+const Product = require("../model/ProductModel");
 const Customer = require("../model/CustomerModel");
+const CustomerService = require("./CustomerService");
+
+const updateVIP = (total) => {
+  if (total < 500000) return 0;
+  else if (total < 2000000) return 1;
+  else if (total < 5000000) return 2;
+  else if (total < 10000000) return 3;
+  else return 4;
+};
 
 const createOrder = (newOrder) => {
   return new Promise(async (resolve, reject) => {
-    const { id, address, status, kho, customer, detail, total } = newOrder;
+    const { id, address, kho, customer, customer_phone_num, detail } = newOrder;
     //Create
     try {
       //Check Order
@@ -25,33 +34,54 @@ const createOrder = (newOrder) => {
         });
       }
 
+      //Xu ly Product cua Order
+      let total = 0;
+      await Promise.all(
+        detail.map(async (value) => {
+          const x = await Product.findById(value.product);
+          await Product.findByIdAndUpdate(value.product, {
+            quantity: x.quantity - value.quantity,
+          });
+          total = total + value.quantity * x.price;
+        })
+      );
+
+      // Them Order vao Customer
       const checkedCustomer = await Customer.findOne({
         phone_num: customer_phone_num,
       });
+
       if (checkedCustomer === null) {
-        const createdCustomer = await Customer.create({
+        const newCustomer = {
           name: customer,
           phone_num: customer_phone_num,
           kho: kho,
-        });
-        checkedKho.customers.push(createdCustomer);
-      } else {
-        
+        };
+        await CustomerService.createCustomer(newCustomer);
       }
 
-      const createdOrder = await Order.create(newOrder);
+      const secondCheckedCustomer = await Customer.findOne({
+        phone_num: customer_phone_num,
+      });
+
+      const createdOrder = await Order.create({
+        address,
+        kho,
+        detail,
+        customer: secondCheckedCustomer,
+        total,
+      });
+
+      secondCheckedCustomer.orders_history.push(createdOrder._id);
+      await Customer.findOneAndUpdate(
+        { phone_num: customer_phone_num },
+        { orders_history: secondCheckedCustomer.orders_history }
+      );
 
       //Them Order vao Kho
       checkedKho.orders.push(createdOrder);
-      const resKho = await Kho.findByIdAndUpdate(kho, {
+      await Kho.findByIdAndUpdate(kho, {
         orders: checkedKho.orders,
-      });
-
-      //Them Order vao category
-      checkedCategory.orders.push(createdOrder);
-
-      const resCategory = await Category.findByIdAndUpdate(category, {
-        orders: checkedCategory.orders,
       });
 
       if (createdOrder) {
@@ -61,9 +91,6 @@ const createOrder = (newOrder) => {
           message: "Thành công",
           data: {
             data: createdOrder,
-            kho: resKho,
-            category: resCategory,
-            nguon_nhap: checkedNguonnhap,
           },
         });
       }
@@ -87,22 +114,6 @@ const updateOrder = (id, data) => {
         });
       }
 
-      //update category
-      if (checkedOrder.category.toString() !== data.category) {
-        const oldCt = await Category.findById(checkedOrder.category);
-        const newCt = await Category.findById(data.category);
-
-        oldCt.orders.pop(checkedOrder);
-        await Category.findByIdAndUpdate(checkedOrder.category, {
-          orders: oldCt.orders,
-        });
-
-        newCt.orders.push(checkedOrder);
-        await Category.findByIdAndUpdate(data.category, {
-          orders: newCt.orders,
-        });
-      }
-
       const res = await Order.findByIdAndUpdate(id, data);
 
       resolve({
@@ -110,6 +121,95 @@ const updateOrder = (id, data) => {
         status: "OK",
         message: "Thành công",
         data: res,
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const completeOrder = (id, data) => {
+  return new Promise(async (resolve, reject) => {
+    //Update
+    try {
+      //Check Order
+      const checkedOrder = await Order.findById(id);
+
+      const { total, phone_num } = data;
+
+      if (checkedOrder === null) {
+        resolve({
+          error_code: 400,
+          status: "Error!",
+          message: "Đơn hàng không tồn tại",
+        });
+      }
+
+      const checkedCustomer = await Customer.findOne({ phone_num: phone_num });
+
+      if (checkedCustomer === null) {
+        resolve({
+          error_code: 400,
+          status: "Error!",
+          message: "Khách hàng không tồn tại",
+        });
+      }
+      const newTotal = checkedCustomer.total + total;
+      const newVIP = updateVIP(newTotal);
+
+      const cRes = await Customer.findOneAndUpdate(
+        { phone_num: phone_num },
+        { total: newTotal, vip: newVIP }
+      );
+
+      const res = await Order.findByIdAndUpdate(id, { status: 2 });
+
+      resolve({
+        error_code: 0,
+        status: "OK",
+        message: "Thành công",
+        data: { order: res, customer: cRes },
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const cancelOrder = (id, data) => {
+  return new Promise(async (resolve, reject) => {
+    //Update
+    try {
+      //Check Order
+      const { detail } = data;
+
+      const checkedOrder = await Order.findById(id);
+
+      if (checkedOrder === null) {
+        resolve({
+          error_code: 400,
+          status: "Error!",
+          message: "Đơn hàng không tồn tại",
+        });
+      }
+
+      // Xu ly product khi cancel Order
+      await Promise.all(
+        detail.map(async (value) => {
+          const x = await Product.findById(value.product);
+          await Product.findByIdAndUpdate(value.product, {
+            quantity: x.quantity + value.quantity,
+          });
+        })
+      );
+
+      const res = await Order.findByIdAndUpdate(id, { status: 0 });
+
+      resolve({
+        error_code: 0,
+        status: "OK",
+        message: "Thành công",
+        data: { order: res },
       });
     } catch (e) {
       reject(e);
@@ -143,36 +243,15 @@ const deleteOrder = (id) => {
   });
 };
 
-const getAllOrder = (limit = 8, page = 0, sort = "asc", filter, khoid) => {
+const getAllOrder = (limit = 5, page = 0, sort = "asc", filter, khoid) => {
   return new Promise(async (resolve, reject) => {
     //get all orders
     try {
-      //FILTER
-      if (filter) {
-        const filterOrder = await Order.find({ category: filter })
-          .limit(limit)
-          .skip(page * limit);
-        const totalFilter = await Order.find({
-          category: filter,
-        }).countDocuments();
-
-        resolve({
-          message: "Thành công",
-          error_code: 0,
-          data: {
-            data: filterOrder,
-            total: totalFilter,
-            page: Number(page) + 1,
-            totalPage: Math.ceil(totalFilter / limit),
-          },
-        });
-      }
-
       const allOrder = await Order.find({ kho: khoid })
         .limit(limit)
         .skip(page * limit)
         .sort({
-          p_id: sort,
+          created_on: sort,
         });
 
       const totalOrder = await Order.find({ kho: khoid }).countDocuments();
@@ -205,7 +284,7 @@ const getOrder = (id) => {
     //Get
     try {
       //Check Order
-      const checkedOrder = await Order.findOne({ p_id: id });
+      const checkedOrder = await Order.findById(id);
 
       if (checkedOrder === null) {
         resolve({
@@ -232,4 +311,6 @@ module.exports = {
   deleteOrder,
   getAllOrder,
   getOrder,
+  completeOrder,
+  cancelOrder,
 };

@@ -3,9 +3,10 @@ const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema(
   {
     address: { type: String, required: true },
-    status: { type: Boolean, required: true },
+    // 0: huy, 1: dang giao, 2: hoan thanh
+    status: { type: Number, required: true, default: 1 },
     kho: { type: mongoose.Schema.Types.ObjectId, ref: "Kho", required: true },
-    customer: { type: Schema.Types.ObjectId, ref: "Customer", required: true },
+    customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer", required: true },
     detail: [
       {
         product: {
@@ -14,7 +15,6 @@ const orderSchema = new mongoose.Schema(
           required: true,
         },
         quantity: { type: Number, required: true },
-        price: { type: Number, required: true },
       },
     ],
     total: { type: Number, required: true },

@@ -210,7 +210,7 @@ const getProduct = (id) => {
     //Get
     try {
       //Check Product
-      const checkedProduct = await Product.findOne({ p_id: id });
+      const checkedProduct = await Product.findById(id);
 
       if (checkedProduct === null) {
         resolve({

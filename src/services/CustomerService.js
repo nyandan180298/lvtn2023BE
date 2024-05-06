@@ -31,7 +31,7 @@ const createCustomer = (newCustomer) => {
       //Them Customer vao Kho
       checkedKho.customers.push(createdCustomer);
 
-      await Kho.findByIdAndUpdate(kho, {customers: checkedKho.customers})
+      await Kho.findByIdAndUpdate(kho, { customers: checkedKho.customers });
 
       if (createdCustomer) {
         resolve({
@@ -167,12 +167,12 @@ const getCustomer = (id) => {
     //Get
     try {
       //Check Customer
-      const checkedCustomer = await Customer.findOne({ p_id: id });
+      const checkedCustomer = await Customer.findById(id);
 
       if (checkedCustomer === null) {
         resolve({
           status: "Error!",
-          message: "Sản phẩm không tồn tại",
+          message: "Khách hàng không tồn tại",
         });
       }
 

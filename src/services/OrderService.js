@@ -243,7 +243,7 @@ const deleteOrder = (id) => {
   });
 };
 
-const getAllOrder = (limit = 5, page = 0, sort = "desc", search, searchid, khoid) => {
+const getAllOrder = (limit = 5, page = 0, sort = "desc", filter, search, searchid, khoid) => {
   return new Promise(async (resolve, reject) => {
     //get all orders
     try {
@@ -255,6 +255,10 @@ const getAllOrder = (limit = 5, page = 0, sort = "desc", search, searchid, khoid
 
       if (searchid) {
         query._id = searchid
+      }
+
+      if (filter) {
+        query.status = filter
       }
 
       const allOrder = await Order.find(query)

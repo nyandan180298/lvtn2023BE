@@ -148,7 +148,14 @@ const deleteProduct = (id) => {
   });
 };
 
-const getAllProduct = (limit = 8, page = 0, sort = "asc", search, khoid) => {
+const getAllProduct = (
+  limit = 8,
+  page = 0,
+  sort = "asc",
+  filter,
+  search,
+  khoid
+) => {
   return new Promise(async (resolve, reject) => {
     //get all products
     try {
@@ -160,6 +167,10 @@ const getAllProduct = (limit = 8, page = 0, sort = "asc", search, khoid) => {
           { name: { $regex: search, $options: "i" } },
           { p_id: { $regex: search, $options: "i" } },
         ];
+      }
+
+      if (filter) {
+        query.category = filter;
       }
 
       const allProduct = await Product.find(query)

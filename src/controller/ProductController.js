@@ -93,7 +93,7 @@ const deleteProduct = async (req, res) => {
 
 const getAllProduct = async (req, res) => {
   try {
-    const { limit, page, sort, search } = req.query;
+    const { limit, page, sort, search, filter } = req.query;
     const { khoid } = req.body;
     const pageVar = page ? page - 1 : 0;
 
@@ -108,6 +108,7 @@ const getAllProduct = async (req, res) => {
       limit,
       pageVar,
       sort,
+      filter,
       search,
       khoid
     );

@@ -118,7 +118,7 @@ const deleteOrder = async (req, res) => {
 
 const getAllOrder = async (req, res) => {
   try {
-    const { limit, page, sort, search, searchid } = req.query;
+    const { limit, page, sort, search, searchid, filter } = req.query;
     const { khoid } = req.body;
     const pageVar = page ? page - 1 : 0;
 
@@ -133,6 +133,7 @@ const getAllOrder = async (req, res) => {
       limit,
       pageVar,
       sort,
+      filter,
       search,
       searchid,
       khoid

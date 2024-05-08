@@ -14,7 +14,6 @@ const userSchema = new mongoose.Schema(
     },
 
     kho: [{ type: mongoose.Schema.Types.ObjectId, ref: "Kho" }],
-    staff: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
     accessToken: { type: String, require: true },
     refreshToken: { type: String, require: true },

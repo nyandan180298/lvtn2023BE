@@ -103,36 +103,24 @@ const deleteCustomer = (id) => {
   });
 };
 
-const getAllCustomer = (limit = 8, page = 0, sort = "asc", filter, khoid) => {
+const getAllCustomer = (limit = 8, page = 0, sort = "asc", search, khoid) => {
   return new Promise(async (resolve, reject) => {
     //get all customers
     try {
-      //FILTER
-      if (filter) {
-        const filterCustomer = await Customer.find()
-          .limit(limit)
-          .skip(page * limit);
-        const totalFilter = await Customer.find({
-          category: filter,
-        }).countDocuments();
+      const query = { kho: khoid };
 
-        resolve({
-          message: "Thành công",
-          error_code: 0,
-          data: {
-            data: filterCustomer,
-            total: totalFilter,
-            page: Number(page) + 1,
-            totalPage: Math.ceil(totalFilter / limit),
-          },
-        });
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: "i" } },
+          { phone_num: { $regex: search, $options: "i" } },
+        ];
       }
 
-      const allCustomer = await Customer.find({ kho: khoid })
+      const allCustomer = await Customer.find(query)
         .limit(limit)
         .skip(page * limit)
         .sort({
-          name: sort,
+          vip: "desc", total: "desc", name: sort
         });
 
       const totalCustomer = await Customer.find({

@@ -24,5 +24,8 @@ const orderSchema = new mongoose.Schema(
     timeStamps: true,
   }
 );
+// Create text indexs
+orderSchema.index({ address: 'text' });
+
 const Order = mongoose.model("Order", orderSchema);
 module.exports = { Order };

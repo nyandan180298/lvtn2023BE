@@ -148,32 +148,21 @@ const deleteProduct = (id) => {
   });
 };
 
-const getAllProduct = (limit = 8, page = 0, sort = "asc", filter, khoid) => {
+const getAllProduct = (limit = 8, page = 0, sort = "asc", search, khoid) => {
   return new Promise(async (resolve, reject) => {
     //get all products
     try {
-      //FILTER
-      if (filter) {
-        const filterProduct = await Product.find({ category: filter })
-          .limit(limit)
-          .skip(page * limit);
-        const totalFilter = await Product.find({
-          category: filter,
-        }).countDocuments();
+      //SEARCH
+      const query = { kho: khoid };
 
-        resolve({
-          message: "Thành công",
-          error_code: 0,
-          data: {
-            data: filterProduct,
-            total: totalFilter,
-            page: Number(page) + 1,
-            totalPage: Math.ceil(totalFilter / limit),
-          },
-        });
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: "i" } },
+          { p_id: { $regex: search, $options: "i" } },
+        ];
       }
 
-      const allProduct = await Product.find({ kho: khoid })
+      const allProduct = await Product.find(query)
         .limit(limit)
         .skip(page * limit)
         .sort({

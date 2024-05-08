@@ -19,5 +19,9 @@ const productSchema = new mongoose.Schema(
     timeStamps: true,
   }
 );
+
+productSchema.index({ name: 'text' });
+productSchema.index({ p_id: 'text' });
+
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;

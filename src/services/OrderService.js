@@ -5,10 +5,10 @@ const Customer = require("../model/CustomerModel");
 const CustomerService = require("./CustomerService");
 
 const updateVIP = (total) => {
-  if (total < 500000) return 0;
-  else if (total < 2000000) return 1;
-  else if (total < 5000000) return 2;
-  else if (total < 10000000) return 3;
+  if (total < 1000000) return 0;
+  else if (total < 5000000) return 1;
+  else if (total < 20000000) return 2;
+  else if (total < 50000000) return 3;
   else return 4;
 };
 
@@ -243,22 +243,31 @@ const deleteOrder = (id) => {
   });
 };
 
-const getAllOrder = (limit = 5, page = 0, sort = "asc", filter, khoid) => {
+const getAllOrder = (limit = 5, page = 0, sort = "desc", search, searchid, khoid) => {
   return new Promise(async (resolve, reject) => {
     //get all orders
     try {
-      const allOrder = await Order.find({ kho: khoid })
+      const query = { kho: khoid };
+
+      if (search) {
+        query.address = { $regex: search, $options: "i" };
+      }
+
+      if (searchid) {
+        query._id = searchid
+      }
+
+      const allOrder = await Order.find(query)
         .limit(limit)
         .skip(page * limit)
         .sort({
           created_on: sort,
         });
-
-      const totalOrder = await Order.find({ kho: khoid }).countDocuments();
+      const totalOrder = await Order.find(query).countDocuments();
 
       if (!allOrder[0]) {
         resolve({
-          message: "Không có sản phẩm trong Kho",
+          message: "Không có Đơn hàng trong Kho",
           error_code: 400,
         });
       }

@@ -7,8 +7,7 @@ const createCustomer = async (req, res) => {
     if (!phone_num || !name || !kho) {
       return res.status(200).json({
         status: "Error",
-        message:
-          "Tất cả input name, phone_num, kho, đều cần thiết!",
+        message: "Tất cả input name, phone_num, kho, đều cần thiết!",
       });
     }
 
@@ -64,8 +63,8 @@ const deleteCustomer = async (req, res) => {
 
 const getAllCustomer = async (req, res) => {
   try {
-    const { limit, page, sort } = req.query;
-    const { filter, khoid } = req.body;
+    const { limit, page, sort, search } = req.query;
+    const { khoid } = req.body;
     const pageVar = page ? page - 1 : 0;
 
     if (!khoid) {
@@ -79,7 +78,7 @@ const getAllCustomer = async (req, res) => {
       limit,
       pageVar,
       sort,
-      filter,
+      search,
       khoid
     );
     return res.status(200).json(result);

@@ -7,5 +7,9 @@ const customerSchema = new mongoose.Schema({
   kho: {type: mongoose.Schema.Types.ObjectId, required: true, ref: "Kho"},
   orders_history: [{type: mongoose.Schema.Types.ObjectId, required: true, ref: "Order"}]
 });
+
+customerSchema.index({ name: 'text' });
+customerSchema.index({ phone_num: 'text' });
+
 const Customer = mongoose.model("Customer", customerSchema);
 module.exports = Customer;

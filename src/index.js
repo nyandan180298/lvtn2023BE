@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const routes = require("./routes");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const schedule = require('./middleware/schedule');
 
 dotenv.config();
 
@@ -27,3 +28,5 @@ mongoose
 app.listen(port, () => {
   console.log("Server is running in port: ", +port);
 });
+
+schedule

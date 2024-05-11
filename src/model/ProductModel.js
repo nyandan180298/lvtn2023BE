@@ -23,5 +23,12 @@ const productSchema = new mongoose.Schema(
 productSchema.index({ name: 'text' });
 productSchema.index({ p_id: 'text' });
 
+productSchema.virtual('daysRemaining').get(function() {
+  const today = new Date();
+  const expireDate = this.han_sd;
+  const diff = expireDate.getTime() - today.getTime();
+  return Math.ceil(diff / (1000 * 3600 * 24));
+});
+
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;

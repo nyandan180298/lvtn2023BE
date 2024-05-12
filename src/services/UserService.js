@@ -2,50 +2,40 @@ const User = require("../model/UserModel");
 const bcrypt = require("bcrypt");
 const { generateAccessToken, generateRefreshToken } = require("./JwtService");
 
-const createUser = (newUser) => {
-  return new Promise(async (resolve, reject) => {
-    const { uid, username, email, password, first_name, last_name } =
-      newUser;
-    //Password BCRYPT
-    const hash = bcrypt.hashSync(password, 10);
-    //Create
-    try {
-      //Check User
-      const checkedUser =
-        (await User.findOne({
-          username: username,
-        })) ||
-        (await User.findOne({
-          email: email,
-        }));
+const createUser = async (newUser) => {
+  const { uid, username, email, password, first_name, last_name } = newUser;
+  const hash = bcrypt.hashSync(password, 10);
 
-      if (checkedUser !== null) {
-        resolve({
-          status: "Error!",
-          message: "Username hoặc email đã tồn tại",
-        });
-      }
+  try {
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      $or: [{ uid }, { username }, { email }],
+    });
 
-      const createdUser = await User.create({
-        uid,
-        username,
-        email,
-        password: hash,
-        first_name,
-        last_name,
-      });
-      if (createdUser) {
-        resolve({
-          status: "OK",
-          message: "Thành công",
-          data: createdUser,
-          error_code: 0,
-        });
-      }
-    } catch (e) {
-      reject(e);
+    if (existingUser) {
+      throw new Error("Uid, username hoặc email đã tồn tại");
     }
-  });
+
+    // Create user
+    const createdUser = await User.create({
+      uid,
+      username,
+      email,
+      password: hash,
+      first_name,
+      last_name,
+      is_admin: true,
+    });
+
+    return {
+      status: "OK",
+      message: "User created successfully",
+      data: createdUser,
+      error_code: 0,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 
 const loginUser = (userLogin) => {

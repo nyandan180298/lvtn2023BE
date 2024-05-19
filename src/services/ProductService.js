@@ -180,7 +180,7 @@ const getAllProduct = (
           p_id: sort,
         });
 
-      const totalProduct = await Product.find({ kho: khoid }).countDocuments();
+      const totalProduct = await Product.find(query).countDocuments();
 
       if (!allProduct[0]) {
         resolve({

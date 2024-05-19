@@ -75,6 +75,27 @@ const completeOrder = async (req, res) => {
   }
 };
 
+const confirmOrder = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = req.body;
+
+    if (!id) {
+      return res.status(400).json({
+        status: "Error",
+        message: "Thiếu id đơn hàng!",
+      });
+    }
+
+    const result = await OrderService.confirmOrder(id, data);
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
 const cancelOrder = async (req, res) => {
   try {
     const id = req.params.id;
@@ -118,7 +139,8 @@ const deleteOrder = async (req, res) => {
 
 const getAllOrder = async (req, res) => {
   try {
-    const { limit, page, sort, search, searchid, filter } = req.query;
+    const { limit, page, sort, search, searchid, filter, filter_confirm } =
+      req.query;
     const { khoid } = req.body;
     const pageVar = page ? page - 1 : 0;
 
@@ -134,6 +156,7 @@ const getAllOrder = async (req, res) => {
       pageVar,
       sort,
       filter,
+      filter_confirm,
       search,
       searchid,
       khoid
@@ -174,4 +197,5 @@ module.exports = {
   getOrder,
   completeOrder,
   cancelOrder,
+  confirmOrder,
 };

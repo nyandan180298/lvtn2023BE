@@ -14,7 +14,8 @@ const updateVIP = (total) => {
 
 const createOrder = (newOrder) => {
   return new Promise(async (resolve, reject) => {
-    const { id, address, kho, customer, customer_phone_num, detail } = newOrder;
+    const { id, address, kho, customer, customer_phone_num, detail, is_admin } =
+      newOrder;
     //Create
     try {
       //Check Order
@@ -64,12 +65,20 @@ const createOrder = (newOrder) => {
         phone_num: customer_phone_num,
       });
 
+      let is_confirm = true;
+      if (is_admin === "1") {
+        is_confirm = true;
+      } else {
+        is_confirm = false;
+      }
+
       const createdOrder = await Order.create({
         address,
         kho,
         detail,
         customer: secondCheckedCustomer,
         total,
+        is_confirm,
       });
 
       secondCheckedCustomer.orders_history.push(createdOrder._id);
@@ -176,6 +185,35 @@ const completeOrder = (id, data) => {
   });
 };
 
+const confirmOrder = (id, data) => {
+  return new Promise(async (resolve, reject) => {
+    //Update
+    try {
+      //Check Order
+      const checkedOrder = await Order.findById(id);
+
+      if (checkedOrder === null) {
+        resolve({
+          error_code: 400,
+          status: "Error!",
+          message: "Đơn hàng không tồn tại",
+        });
+      }
+
+      const res = await Order.findByIdAndUpdate(id, { is_confirm: true });
+
+      resolve({
+        error_code: 0,
+        status: "OK",
+        message: "Thành công",
+        data: { order: res },
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 const cancelOrder = (id, data) => {
   return new Promise(async (resolve, reject) => {
     //Update
@@ -243,7 +281,16 @@ const deleteOrder = (id) => {
   });
 };
 
-const getAllOrder = (limit = 5, page = 0, sort = "desc", filter, search, searchid, khoid) => {
+const getAllOrder = (
+  limit = 5,
+  page = 0,
+  sort = "desc",
+  filter,
+  filter_confirm,
+  search,
+  searchid,
+  khoid
+) => {
   return new Promise(async (resolve, reject) => {
     //get all orders
     try {
@@ -254,11 +301,15 @@ const getAllOrder = (limit = 5, page = 0, sort = "desc", filter, search, searchi
       }
 
       if (searchid) {
-        query._id = searchid
+        query._id = searchid;
       }
 
       if (filter) {
-        query.status = filter
+        query.status = filter;
+      }
+
+      if (filter_confirm) {
+        query.is_confirm = filter_confirm;
       }
 
       const allOrder = await Order.find(query)
@@ -326,4 +377,5 @@ module.exports = {
   getOrder,
   completeOrder,
   cancelOrder,
+  confirmOrder,
 };

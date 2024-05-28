@@ -20,7 +20,7 @@ cron.schedule("0 0 * * *", async () => {
         (product.han_sd - new Date(Date.now())) / (1000 * 60 * 60 * 24)
       );
 
-      if (expireDate < 0) {
+      if (expireDate < 1) {
         const notification = await Notification.create({
           message: `Sản phẩm "${product.name}" đã hết hạn`,
           is_read: 0,

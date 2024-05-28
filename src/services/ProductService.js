@@ -149,7 +149,7 @@ const deleteProduct = (id) => {
 };
 
 const getAllProduct = (
-  limit = 8,
+  limit = 9,
   page = 0,
   sort = "asc",
   filter,

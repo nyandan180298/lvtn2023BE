@@ -120,6 +120,36 @@ const getAllProduct = async (req, res) => {
   }
 };
 
+const getAllCustomerProduct = async (req, res) => {
+  try {
+    const { kid } = req.params.id;
+    const { limit, page, sort, search, filter } = req.query;
+    const { khoid } = req.body;
+    const pageVar = page ? page - 1 : 0;
+
+    if (!khoid) {
+      return res.status(400).json({
+        status: "Error",
+        message: "Phải kèm id của kho",
+      });
+    }
+
+    const result = await ProductService.getAllCustomerProduct(
+      limit,
+      pageVar,
+      sort,
+      filter,
+      search,
+      khoid
+    );
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
 const getProduct = async (req, res) => {
   try {
     const pid = req.params.id;
@@ -145,5 +175,6 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getAllProduct,
+  getAllCustomerProduct,
   getProduct,
 };

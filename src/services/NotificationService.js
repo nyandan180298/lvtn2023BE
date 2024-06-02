@@ -23,9 +23,7 @@ const getAllNotification = (
           sent_on: sort,
         });
 
-      const totalNotification = await Notification.find({
-        kho: khoid,
-      }).countDocuments();
+      const totalNotification = await Notification.find(query).countDocuments();
 
       if (!allNotification[0]) {
         resolve({
@@ -42,6 +40,34 @@ const getAllNotification = (
           total: totalNotification,
           page: Number(page) + 1,
           totalPage: Math.ceil(totalNotification / limit),
+        },
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const getUnreadNotification = (khoid) => {
+  return new Promise(async (resolve, reject) => {
+    //get all notifications
+    try {
+      const query = { kho: khoid, is_read: false };
+
+      const totalNotification = await Notification.find(query).countDocuments();
+
+      if (totalNotification === 0) {
+        resolve({
+          message: "Không có thông báo trong Kho",
+          error_code: 400,
+        });
+      }
+
+      resolve({
+        message: "Thành công",
+        error_code: 0,
+        data: {
+          total: totalNotification,
         },
       });
     } catch (e) {
@@ -107,4 +133,5 @@ module.exports = {
   getAllNotification,
   readNotification,
   readAllNotification,
+  getUnreadNotification,
 };

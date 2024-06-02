@@ -8,7 +8,10 @@ const productSchema = new mongoose.Schema(
     nguon_nhap: { type: mongoose.Schema.Types.ObjectId, ref: "NguonNhap" },
     ngay_nhap: { type: Date, required: true },
     han_sd: { type: Date, require: true },
-    image: { type: Buffer, require: true },
+    image: {
+      name: { type: String, require: true },
+      path: { type: String, require: true },
+    },
     category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
     kho: { type: mongoose.Schema.Types.ObjectId, ref: "Kho", required: true },
 
@@ -20,10 +23,10 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-productSchema.index({ name: 'text' });
-productSchema.index({ p_id: 'text' });
+productSchema.index({ name: "text" });
+productSchema.index({ p_id: "text" });
 
-productSchema.virtual('daysRemaining').get(function() {
+productSchema.virtual("daysRemaining").get(function () {
   const today = new Date();
   const expireDate = this.han_sd;
   const diff = expireDate.getTime() - today.getTime();

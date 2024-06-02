@@ -2,6 +2,8 @@ const Category = require("../model/CategoryModel");
 const NguonNhap = require("../model/NguonNhapModel");
 const Product = require("../model/ProductModel");
 const Kho = require("../model/KhoModel");
+const ImageService = require("../services/ImageService");
+const Image = require("../model/imageModel");
 
 const createProduct = (newProduct) => {
   return new Promise(async (resolve, reject) => {
@@ -40,7 +42,7 @@ const createProduct = (newProduct) => {
       if (checkedProduct !== null) {
         resolve({
           status: "Error!",
-          message: "Sản phẩm đã tồn tại",
+          message: "Mã sản phẩm đã tồn tại",
         });
       }
 
@@ -83,6 +85,7 @@ const updateProduct = (id, data) => {
     //Update
     try {
       //Check Product
+      const { image } = data;
       const checkedProduct = await Product.findById(id);
 
       if (checkedProduct === null) {
@@ -90,6 +93,11 @@ const updateProduct = (id, data) => {
           status: "Error!",
           message: "Sản phẩm không tồn tại",
         });
+      }
+
+      //delete old image
+      if (checkedProduct.image) {
+        await ImageService.deleteImage(checkedProduct.image.path);
       }
 
       //update category
@@ -205,6 +213,63 @@ const getAllProduct = (
   });
 };
 
+const getAllCustomerProduct = (
+  limit = 9,
+  page = 0,
+  sort = "asc",
+  filter,
+  search,
+  khoid
+) => {
+  return new Promise(async (resolve, reject) => {
+    //get all products
+    try {
+      //SEARCH
+      const query = { kho: khoid };
+
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: "i" } },
+          { p_id: { $regex: search, $options: "i" } },
+        ];
+      }
+
+      if (filter) {
+        query.category = filter;
+      }
+
+      const allProduct = await Product.find(query)
+        .limit(limit)
+        .skip(page * limit)
+        .sort({
+          p_id: sort,
+        });
+
+      const totalProduct = await Product.find(query).countDocuments();
+
+      if (!allProduct[0]) {
+        resolve({
+          message: "Không có sản phẩm trong Kho",
+          error_code: 400,
+        });
+      }
+
+      resolve({
+        message: "Thành công",
+        error_code: 0,
+        data: {
+          data: allProduct,
+          total: totalProduct,
+          page: Number(page) + 1,
+          totalPage: Math.ceil(totalProduct / limit),
+        },
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
 const getProduct = (id) => {
   return new Promise(async (resolve, reject) => {
     //Get
@@ -236,5 +301,6 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getAllProduct,
+  getAllCustomerProduct,
   getProduct,
 };

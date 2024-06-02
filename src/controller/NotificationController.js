@@ -28,6 +28,26 @@ const getAllNotification = async (req, res) => {
   }
 };
 
+const getUnreadNotification = async (req, res) => {
+  try {
+    const { khoid } = req.body;
+
+    if (!khoid) {
+      return res.status(400).json({
+        status: "Error",
+        message: "Phải kèm id của kho",
+      });
+    }
+
+    const result = await NotificationService.getUnreadNotification(khoid);
+    return res.status(200).json(result);
+  } catch (e) {
+    return res.status(404).json({
+      message: e,
+    });
+  }
+};
+
 const readNotification = async (req, res) => {
   try {
     const id = req.params.id;
@@ -72,4 +92,5 @@ module.exports = {
   getAllNotification,
   readNotification,
   readAllNotification,
+  getUnreadNotification,
 };
